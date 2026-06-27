@@ -70,7 +70,8 @@ python manage.py runserver
 👨‍💻 Desenvolvido por
 [Emilly Marrocos]
 
-[[Seu LinkedIn](https://www.linkedin.com/in/emilly-marrocos-mendon%C3%A7a-ciriaco-5751b1385/)]
-[[Seu Portfólio/Instagram](https://www.instagram.com/emilly.codes/)]
+LinkedIN: (https://www.linkedin.com/in/emilly-marrocos-mendon%C3%A7a-ciriaco-5751b1385/)
+
+Instagram: (https://www.instagram.com/emilly.codes/)
 
 Este projeto foi desenvolvido como uma solução real para a comunidade de videomakers, unindo habilidades de desenvolvimento Full-Stack e o entendimento das dores do mercado audiovisual.
