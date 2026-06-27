@@ -28,10 +28,13 @@ Django REST Framework (DRF): Construção da API RESTful.
 Django Channels + Redis: Gerenciamento de conexões WebSocket para o chat em tempo real.
 PostgreSQL: Banco de dados relacional para estruturação robusta de usuários e conteúdos.
 Docker & Docker Compose: Containerização do ambiente de desenvolvimento.
+
 Frontend & Mídia
 
 React / Next.js: Interface de usuário reativa, dinâmica e amigável a SEO.
+
 Cloudinary API: Gerenciamento e otimização de upload de mídias (vídeos e imagens).
+
 ⚙️ Como Executar Localmente
 Pré-requisitos
 Docker e Docker Compose instalados na sua máquina.
