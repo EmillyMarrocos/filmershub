@@ -36,10 +36,15 @@ React / Next.js: Interface de usuário reativa, dinâmica e amigável a SEO.
 Cloudinary API: Gerenciamento e otimização de upload de mídias (vídeos e imagens).
 
 ⚙️ Como Executar Localmente
+
 Pré-requisitos
+
 Docker e Docker Compose instalados na sua máquina.
+
+
 Passos
-Clone o repositório:
+
+Clone o repositório
 bash
 
 git clone https://github.com/seu-usuario/filmershub.git
