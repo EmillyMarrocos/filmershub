@@ -1,0 +1,43 @@
+# ===========================================
+# FILMERSHUB - DEPENDÊNCIAS BASE
+# ===========================================
+# Usado em todos os ambientes (dev, teste, produção)
+
+# Django
+django>=5.0,<6.0
+
+# Django REST Framework (APIs REST)
+djangorestframework>=3.15
+
+# Autenticação JWT (JSON Web Token)
+djangorestframework-simplejwt>=5.3
+
+# Documentação da API (Swagger/OpenAPI)
+drf-spectacular>=0.27
+
+# CORS (Cross-Origin Resource Sharing)
+# Permite que o frontend acesse o backend
+django-cors-headers>=4.3
+
+# WebSockets (chat em tempo real)
+channels>=4.0
+daphne>=4.0
+channels-redis>=4.2
+
+# Banco de dados PostgreSQL
+psycopg2-binary>=2.9
+
+# Manipulação de imagens
+Pillow>=10.0
+
+# Geração de PDF (contratos)
+weasyprint>=60.0
+
+# Variáveis de ambiente
+python-decouple>=3.8
+
+# Pagamentos (Mercado Pago)
+mercadopago>=2.3
+
+# Envio de emails (SendGrid)
+sendgrid>=6.0

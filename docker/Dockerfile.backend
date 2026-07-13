@@ -1,0 +1,47 @@
+# ===========================================
+# FILMERSHUB - BACKEND (Django + DRF)
+# ===========================================
+# Este arquivo define como construir a imagem Docker do backend
+# Comando para buildar: docker-compose build backend
+
+# ---- ETAPA 1: Imagem base ----
+# Usar imagem oficial do Python 3.12 (versão slim = mais leve)
+FROM python:3.12-slim
+
+# ---- ETAPA 2: Variáveis de ambiente ----
+# Python não cria arquivos .pyc e mostra logs em tempo real
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# ---- ETAPA 3: Diretório de trabalho ----
+# Todos os comandos posteriores serão executados dentro de /app
+WORKDIR /app
+
+# ---- ETAPA 4: Dependências do sistema ----
+# gcc = compilador C (necessário para psycopg2)
+# libpq-dev = bibliotecas do PostgreSQL
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---- ETAPA 5: Dependências Python ----
+# Copiar apenas requirements primeiro (cachamento de camadas Docker)
+COPY backend/requirements/ /app/requirements/
+
+# Instalar dependências Python
+# --no-cache-dir = não salvar cache (economiza espaço)
+RUN pip install --no-cache-dir -r requirements/development.txt
+
+# ---- ETAPA 6: Código do backend ----
+# Copiar todo o código do backend
+COPY backend/ /app/
+
+# ---- ETAPA 7: Porta ----
+# Documenta que a aplicação usa a porta 8000
+EXPOSE 8000
+
+# ---- ETAPA 8: Comando padrão ----
+# Roda o servidor de desenvolvimento do Django
+# 0.0.0.0 = aceita conexões de qualquer IP (necessário para Docker)
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -1,0 +1,1898 @@
+================================================================================
+                    FILMERSHUB - DOCUMENTO DE REQUISITOS
+                  Plataforma Social para Videomakers
+================================================================================
+Versão atual: 3.0
+Data: 11/07/2026
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. VISÃO GERAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+O FilmersHub é uma rede social profissional que conecta videomakers a clientes,
+permitindo networking, divulgação de portfólio, agendamento de serviços,
+comunicação em tempo real, gestão de contratos e pagamentos.
+
+Público-alvo:
+  - Videomakers, editores, fotógrafos de eventos
+  - Clientes que buscam profissionais de vídeo (noivos, empresas, artistas)
+
+Objetivo do projeto:
+  - Portfólio técnico para processos seletivos de estágio/vaga júnior
+  - Produto com potencial real de uso
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. HISTÓRICO DE VERSÕES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+v1.0 — 11/07/2026 (Versão Inicial)
+  Estrutura do projeto definida:
+    - Visão geral e público-alvo
+    - Paleta de cores (apenas códigos hex, sem nomes descritivos)
+    - Stack técnica: Django, DRF, React, PostgreSQL, Channels
+    - 6 módulos funcionais:
+        5.1 Autenticação e Perfis
+            - Cadastro simples (email, username, senha)
+            - Login JWT (access + refresh)
+            - Perfis Videomaker/Cliente (mutuamente exclusivos)
+            - 10 endpoints definidos
+        5.2 Portfólio
+            - CRUD de itens com embed YouTube/Vimeo
+            - Categorias e destaque
+            - 4 endpoints definidos
+        5.3 Feed Social
+            - Posts com texto, vídeo, imagem
+            - Likes e comentários
+            - 8 endpoints definidos
+        5.4 Chat em Tempo Real
+            - Conversas 1:1 e grupos
+            - WebSocket com Django Channels
+            - 4 endpoints REST + 1 WebSocket
+        5.5 Agendamento
+            - Disponibilidade por data ou dia da semana
+            - Fluxo de booking com status
+            - 7 endpoints definidos
+        5.6 Contratos
+            - Geração de PDF a partir de agendamento
+            - Aceite digital (ambas as partes)
+            - 6 endpoints definidos
+    - 10 telas de frontend
+    - 10 regras de negócio
+    - 9 semanas de implementação (5 fases)
+    - 11 dependências backend
+    - 7 dependências frontend
+    - 8 variáveis de ambiente
+    - Modelos: User padrão Django, Profile separado
+
+
+v2.0 — 11/07/2026 (Atualização Completa)
+  ADIÇÕES:
+    Paleta de Cores:
+      + Nomes descritivos para cada cor (Void, Obsidian, Graphite, Slate,
+        Iris, Ember, Jade, Amber, Crimson, Azure, Snow, Ash, Muted)
+      + Gradientes nomeados (Hero Gradient, Card Shimmer)
+      + Proporção de uso (60/25/10/5)
+
+    Autenticação (reescrita completa):
+      + Cadastro wizard em 3 etapas:
+          Etapa 1: nome completo, username, email, confirmar email,
+                   telefone/WhatsApp
+          Etapa 2: radio CPF/CNPJ, número do documento, razão social
+                   (condicional CNPJ)
+          Etapa 3: senha com indicador de força, confirmar senha,
+                   checkbox de termos
+      + Confirmação de email via link (token único, expira 24h)
+      + Reenvio de email (máximo 3x por hora)
+      + Complete Profile (pós-cadastro): especialidades, local, bio,
+        avatar, anos experiência, valor hora
+      + Validações: CPF (11 dígitos), CNPJ (14 dígitos), username
+        (3-30 chars), email único, senha (8+ chars, 1 maiúscula, 1
+        número), telefone formato BR
+      + 12 endpoints definidos
+
+    Módulo de Pagamento (NOVO):
+      + Modelo de negócio: comissão 15% por transação (mínimo R$10)
+      + Gateway: Mercado Pago
+      + Split automático: 85% videomaker / 15% FilmersHub
+      + PIX (aprovação imediata) e cartão de crédito (até 12x)
+      + Vinculação via OAuth
+      + Checkout transparente (sem redirecionar)
+      + Webhook de confirmação
+      + Holding de 14 dias para repasse
+      + 10 requisitos funcionais
+      + 4 requisitos não-funcionais
+      + 6 endpoints definidos
+      + 3 models: Payment, PlatformConfig, Payout
+
+    Módulo de Notificações (NOVO):
+      + Canal in-app (badge + lista) + email (SendGrid)
+      + 10 eventos mapeados (mensagem, agendamento, contrato,
+        pagamento, feed)
+      + Preferências de notificação por evento
+      + Templates de email HTML
+      + 9 requisitos funcionais
+      + 4 requisitos não-funcionais
+      + 5 endpoints definidos
+      + 2 models: Notification, NotificationPreference
+
+    Módulo de Testes (NOVO):
+      + Cobertura mínima por módulo (37 cenários definidos)
+      + Backend: pytest-django + DRF APITestCase
+      + Frontend: Vitest + React Testing Library
+      + Comandos de teste definidos
+
+    Telas:
+      + 8 novas rotas: /register/step-1, /register/step-2,
+        /register/step-3, /register/confirm, /complete-profile,
+        /payments/checkout/:id, /payments/history, /settings/link-mp,
+        /notifications
+      + Total: 23 telas
+
+    Modelos do Banco:
+      + User(AbstractUser) com campos customizados (full_name, phone,
+        document_type, document_number, company_name, is_email_confirmed,
+        email_confirmation_token, avatar, bio, location)
+      + Profile como model separado REMOVIDO
+      + +3 models no app payments
+      + +2 models no app notifications
+
+    Dependências:
+      + Backend: mercadopago>=2.3, sendgrid>=6.0, django-extensions>=3.2,
+        pytest-django>=4.8
+      + Frontend: @mercadopago/sdk-js, vitest, @testing-library/react
+      + Dev: faker>=24.0, django-debug-toolbar>=4.3
+
+    Variáveis de Ambiente:
+      + MERCADOPAGO_ACCESS_TOKEN, MERCADOPAGO_PUBLIC_KEY,
+        MERCADOPAGO_WEBHOOK_SECRET, PLATFORM_COMMISSION_PERCENTAGE,
+        SENDGRID_API_KEY, SENDGRID_DEFAULT_FROM, EMAIL_BACKEND
+
+    Regras de Negócio:
+      + R-11 a R-17 (pagamento, email, rate limit)
+      + Total: 17 regras
+
+    Estrutura de Pastas:
+      + Árvore completa de pastas (backend + frontend)
+      + Apps: accounts, portfolio, feed, chat, scheduling, contracts,
+        payments, notifications
+      + Frontend: api/, types/, store/, hooks/, components/ (7 módulos),
+        pages/ (19 páginas), utils/
+      + Backend: utils/, tests/
+
+    Implementação:
+      + Fase 5: Pagamento e Notificações (semanas 9-10)
+      + Fase 6: Polish e Testes (semana 11)
+      + Total: 11 semanas
+
+
+v3.0 — 11/07/2026 (Documento Definitivo)
+  ADIÇÕES:
+    Estrutura Profissional de Contrato:
+      + Modelo visual completo do contrato PDF (12 cláusulas)
+      + Cláusulas: Partes, Objeto, Especificações Técnicas, Valor/Pagamento,
+        Prazo de Entrega, Direitos Autorais, Cancelamento/Reembolso,
+        Confidencialidade, Responsabilidade, Resolução de Conflitos,
+        Disposições Gerais, Assinaturas/Aceite Digital
+      + Contract model expandido (~30 campos)
+      + Template HTML/PDF com WeasyPrint
+      + Número sequencial do contrato (FH-2026-00047)
+      + Hash SHA-256 do documento
+
+    Padrões da API (NOVA SEÇÃO):
+      + Formato padrão de resposta de sucesso
+      + Formato padronizado de erro (code, message, details)
+      + Paginação cursor-based e offset-based
+      + Headers de autenticação JWT
+      + Documentação automática via DRF Spectacular (Swagger/ReDoc)
+
+    Upload de Arquivos (NOVA SEÇÃO):
+      + Limites de tamanho por tipo (avatar 5MB, imagens 10MB, etc.)
+      + Formatos aceitos por tipo
+      + Tratamento de erros de upload
+
+    Cache e Performance (NOVA SEÇÃO):
+      + Estratégia de cache Redis por tipo de dado
+      + TTLs definidos (5min, 10min, 30min)
+      + Lazy loading e code splitting no frontend
+
+    Deploy e CI/CD (NOVA SEÇÃO):
+      + Serviços gratuitos: Vercel (frontend), Railway (backend),
+        Neon (PostgreSQL), Upstash (Redis)
+      + GitHub Actions para testes automáticos
+      + Variáveis de ambiente por ambiente (dev/staging/prod)
+
+    README do Projeto (NOVA SEÇÃO):
+      + Estrutura do README para portfólio
+      + Seções: descrição, stack, screenshots, como rodar, API
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. PALETA DE CORES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Estética cinematográfica (dark mode como padrão), com acentos vibrantes
+que remetem à criatividade e energia do audiovisual.
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           PALETA PRINCIPAL                                  │
+├────────────┬──────────────┬──────────┬──────────────────────────────────────┤
+│ Nome       │ Cor          │ Código   │ Uso                                  │
+├────────────┼──────────────┼──────────┼──────────────────────────────────────┤
+│ Void       │ Preto        │ #0B0B11  │ Fundo principal da aplicação         │
+│ Obsidian   │ Cinza escuro │ #15151F  │ Cards, painéis, modais, sidebars     │
+│ Graphite   │ Cinza médio  │ #1E1E2E  │ Hover states, itens selecionados     │
+│ Slate      │ Cinza borda  │ #2A2A3A  │ Bordas de elementos, separadores     │
+├────────────┼──────────────┼──────────┼──────────────────────────────────────┤
+│ Iris       │ Roxo         │ #7C5CFC  │ Botões principais, links, ícones     │
+│ Iris Dark  │ Roxo escuro  │ #6A4AE0  │ Hover do primary                     │
+│ Iris Light │ Roxo claro   │ #7C5CFC20│ Fundos com opacidade (badges)        │
+├────────────┼──────────────┼──────────┼──────────────────────────────────────┤
+│ Ember      │ Laranja      │ #FF6B35  │ Call-to-action, notificações         │
+│ Ember Dark │ Laranja esc. │ #E55A25  │ Hover do accent                      │
+├────────────┼──────────────┼──────────┼──────────────────────────────────────┤
+│ Jade       │ Verde        │ #22C55E  │ Status confirmado, online, aceito    │
+│ Amber      │ Amarelo      │ #F59E0B  │ Status pendente, alertas             │
+│ Crimson    │ Vermelho     │ #EF4444  │ Erros, exclusões, cancelamentos      │
+│ Azure      │ Azul         │ #3B82F6  │ Informações, links secundários       │
+├────────────┼──────────────┼──────────┼──────────────────────────────────────┤
+│ Snow       │ Branco suave │ #E8E8ED  │ Texto principal (títulos, corpo)     │
+│ Ash        │ Cinza texto  │ #8B8B9E  │ Texto secundário (datas, legendas)   │
+│ Muted      │ Cinza desab. │ #55556A  │ Texto desabilitado, placeholders     │
+└────────────┴──────────────┴──────────┴──────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          VARIAÇÕES DE GRADIENTE                             │
+├──────────────────┬──────────────────────────────────────────────────────────┤
+│ Hero Gradient    │ linear-gradient(135deg, #7C5CFC 0%, #FF6B35 100%)       │
+│                  │ Usado na tela de login/cadastro e banners               │
+├──────────────────┼──────────────────────────────────────────────────────────┤
+│ Card Shimmer     │ linear-gradient(90deg, #15151F 0%, #1E1E2E 50%,         │
+│                  │                    #15151F 100%)                         │
+│                  │ Skeleton loading dos cards                              │
+└──────────────────┴──────────────────────────────────────────────────────────┘
+
+Proporção de uso:
+  60% → Fundos escuros (Void, Obsidian)
+  25% → Texto (Snow, Ash)
+  10% → Primary (Iris)
+   5% → Accent (Ember) e Status colors (Jade, Amber, Crimson)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. STACK TÉCNICA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BACKEND:
+  - Python 3.12+
+  - Django 5.x
+  - Django REST Framework 3.15+
+  - djangorestframework-simplejwt (autenticação JWT)
+  - drf-spectacular (documentação OpenAPI/Swagger)
+  - Django Channels + Daphne (WebSockets)
+  - channels-redis (backend de canais)
+  - django-cors-headers (CORS)
+  - Pillow (manipulação de imagens)
+  - WeasyPrint (geração de PDF)
+  - django-storages + boto3 (armazenamento, opcional)
+  - mercadopago>=2.3 (pagamentos)
+  - django-extensions>=3.2 (dev utils)
+  - sendgrid>=6.0 (envio de emails)
+
+FRONTEND:
+  - React 18+ com TypeScript
+  - Vite (bundler)
+  - React Router v6 (navegação)
+  - Axios (chamadas HTTP)
+  - Socket.io-client ou WebSocket nativo (chat em tempo real)
+  - Zustand (estado global)
+  - Tailwind CSS (estilização)
+  - Lucide React (ícones)
+  - @mercadopago/sdk-js (checkout pagamento)
+
+TESTES:
+  - Backend: pytest-django + DRF APITestCase
+  - Frontend: Vitest + React Testing Library
+
+INFRAESTRUTURA:
+  - PostgreSQL 16 (banco de dados)
+  - Redis (cache + backend do Channels)
+  - Docker + Docker Compose (ambiente local)
+  - Git + GitHub (versionamento)
+  - SendGrid (envio de emails)
+  - GitHub Actions (CI/CD)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. FUNCIONALIDADES POR MÓDULO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+──────────────────────────────────────────────────────────────────────────────
+5.1 MÓDULO: AUTENTICAÇÃO E PERFIS
+──────────────────────────────────────────────────────────────────────────────
+
+Prioridade: ALTA  |  Módulo base (todos os outros dependem dele)
+
+Funcionais:
+  [F-ACC-01] Cadastro wizard em 3 etapas:
+    Etapa 1 — Dados pessoais: nome completo, username, email, confirmar
+              email, telefone/WhatsApp
+    Etapa 2 — Documento: radio button CPF/CNPJ, número do documento,
+              razão social (condicional se CNPJ)
+    Etapa 3 — Senha: campo senha com indicador de força, confirmar senha,
+              checkbox de aceite dos Termos de Uso
+  [F-ACC-02] Confirmação de email via link (token único, expira em 24h)
+  [F-ACC-03] Reenvio de email de confirmação (máximo 3x por hora)
+  [F-ACC-04] Login via email + senha (JWT: access 30min, refresh 7 dias)
+  [F-ACC-05] Logout (invalidação do refresh token)
+  [F-ACC-06] Complete Profile (pós-cadastro): especialidades (multi-select),
+              local de atuação, bio, avatar, anos de experiência, valor hora
+  [F-ACC-07] Perfil extensível: usuário pode ser Videomaker, Cliente ou ambos
+  [F-ACC-08] Edição de perfil (bio, avatar, localização, telefone)
+  [F-ACC-09] Página de perfil público (visualização por outros usuários)
+  [F-ACC-10] Listagem/busca de videomakers (por especialidade, localização)
+
+Validações:
+  [VAL-01] CPF: 11 dígitos, algoritmo de dígitos verificadores
+  [VAL-02] CNPJ: 14 dígitos, algoritmo de dígitos verificadores
+  [VAL-03] Username: 3-30 chars, apenas [a-z0-9_.-], único
+  [VAL-04] Email: formato válido, único no sistema
+  [VAL-05] Senha: mínimo 8 caracteres, 1 maiúscula, 1 número
+  [VAL-06] Telefone: formato BR (DD) 9XXXX-XXXX
+
+Não-funcionais:
+  [NF-ACC-01] Senhas hash com argon2 (via Django default)
+  [NF-ACC-02] Access token expira em 30 min, refresh em 7 dias
+  [NF-ACC-03] Token de confirmação de email expira em 24h
+  [NF-ACC-04] Rate limit: máximo 5 tentativas de login por minuto
+
+Endpoints:
+  POST   /api/auth/register/
+  GET    /api/auth/confirm-email/?token=xxx
+  POST   /api/auth/resend-confirmation/
+  POST   /api/auth/login/
+  POST   /api/auth/token/refresh/
+  POST   /api/auth/logout/
+  GET    /api/users/me/
+  PATCH  /api/users/me/
+  GET    /api/users/{id}/
+  GET    /api/videomakers/?specialty=&location=
+  PATCH  /api/users/me/videomaker-profile/
+  PATCH  /api/users/me/client-profile/
+
+
+──────────────────────────────────────────────────────────────────────────────
+5.2 MÓDULO: PORTFÓLIO
+──────────────────────────────────────────────────────────────────────────────
+
+Prioridade: ALTA  |  Funcionalidade central para videomakers
+
+Funcionais:
+  [F-PRT-01] Adicionar item ao portfólio (título, descrição, URL do vídeo, categoria)
+  [F-PRT-02] Editar item do portfólio
+  [F-PRT-03] Remover item do portfólio
+  [F-PRT-04] Marcar/desmarcar item como destaque (featured)
+  [F-PRT-05] Visualizar portfólio de qualquer usuário (página pública)
+  [F-PRT-06] Embed automático de vídeos YouTube/Vimeo
+  [F-PRT-07] Thumbnail opcional customizada
+  [F-PRT-08] Filtrar por categoria (casamento, evento, clipe, etc.)
+
+Não-funcionais:
+  [NF-PRT-01] Máximo de 50 itens por usuário (free tier conceitual)
+  [NF-PRT-02] Validação da URL do vídeo (aceitar apenas YouTube/Vimeo)
+  [NF-PRT-03] Thumbnails geradas automaticamente a partir do embed (ideal)
+
+Endpoints:
+  GET    /api/portfolio/{user_id}/
+  POST   /api/portfolio/
+  PATCH  /api/portfolio/{id}/
+  DELETE /api/portfolio/{id}/
+
+
+──────────────────────────────────────────────────────────────────────────────
+5.3 MÓDULO: FEED SOCIAL
+──────────────────────────────────────────────────────────────────────────────
+
+Prioridade: MÉDIA  |  Engajamento e visibilidade
+
+Funcionais:
+  [F-FED-01] Publicar post com texto, vídeo embutido e/ou imagem
+  [F-FED-02] Feed com posts de todos os usuários (versão inicial)
+  [F-FED-03] Curtir post (toggle like/unlike)
+  [F-FED-04] Comentar em post
+  [F-FED-05] Excluir próprio post
+  [F-FED-06] Compartilhar post (copiar link)
+  [F-FED-07] Contagem de curtidos e comentários visível
+
+Não-funcionais:
+  [NF-FED-01] Paginação do feed (20 posts por página)
+  [NF-FED-02] Posts ordenados por data de criação (mais recente primeiro)
+  [NF-FED-03] Imagens redimensionadas automaticamente no upload
+
+Endpoints:
+  GET    /api/feed/
+  POST   /api/feed/posts/
+  DELETE /api/feed/posts/{id}/
+  POST   /api/feed/posts/{id}/like/
+  DELETE /api/feed/posts/{id}/like/
+  GET    /api/feed/posts/{id}/comments/
+  POST   /api/feed/posts/{id}/comments/
+  DELETE /api/feed/comments/{id}/
+
+
+──────────────────────────────────────────────────────────────────────────────
+5.4 MÓDULO: CHAT EM TEMPO REAL
+──────────────────────────────────────────────────────────────────────────────
+
+Prioridade: MÉDIA  |  Comunicação direta fecha negociações
+
+Funcionais:
+  [F-CHT-01] Iniciar conversa 1:1 com qualquer usuário
+  [F-CHT-02] Criar grupo de conversa (múltiplos participantes)
+  [F-CHT-03] Enviar mensagem de texto
+  [F-CHT-04] Receber mensagens em tempo real (WebSocket)
+  [F-CHT-05] Listar todas as conversas do usuário
+  [F-CHT-06] Histórico de mensagens (scroll para cima carrega mais)
+  [F-CHT-07] Indicador de "digitando..."
+  [F-CHT-08] Mensagens não-lidas (badge de contagem)
+  [F-CHT-09] Adicionar/remover participantes de grupo
+
+Não-funcionais:
+  [NF-CHT-01] Mensagens persistidas no PostgreSQL
+  [NF-CHT-02] Máximo de 50 participantes por grupo
+  [NF-CHT-03] Reconexão automática do WebSocket
+  [NF-CHT-04] Scroll infinito no histórico de mensagens
+
+Endpoints REST:
+  GET    /api/chat/conversations/
+  POST   /api/chat/conversations/
+  GET    /api/chat/conversations/{id}/messages/?limit=50&before=<timestamp>
+  POST   /api/chat/conversations/{id}/members/
+
+WebSocket:
+  WS     /ws/chat/{conversation_id}/
+
+
+──────────────────────────────────────────────────────────────────────────────
+5.5 MÓDULO: AGENDAMENTO
+──────────────────────────────────────────────────────────────────────────────
+
+Prioridade: MÉDIA  |  Conecta disponibilidade com demanda
+
+Funcionais:
+  [F-SCH-01] Videomaker cadastra disponibilidade (data específica + horário)
+  [F-SCH-02] Videomaker pode criar slots recorrentes (dia da semana)
+  [F-SCH-03] Cliente vê agenda disponível do videomaker
+  [F-SCH-04] Cliente solicita agendamento (data, horário, descrição do evento)
+  [F-SCH-05] Videomaker confirma ou rejeita agendamento
+  [F-SCH-06] Status: Pendente → Confirmado → Concluído / Cancelado
+  [F-SCH-07] Calendário visual (month view com dots nos dias com eventos)
+  [F-SCH-08] Notificação de nova solicitação / mudança de status
+
+Não-funcionais:
+  [NF-SCH-01] Conflito de horário (sistema deve impedir duplo agendamento)
+  [NF-SCH-02] Fuso horário do usuário deve ser considerado
+  [NF-SCH-03] Datas passadas não podem ser agendadas
+
+Endpoints:
+  GET    /api/scheduling/availability/{videomaker_id}/
+  POST   /api/scheduling/availability/
+  DELETE /api/scheduling/availability/{id}/
+  GET    /api/scheduling/bookings/
+  POST   /api/scheduling/bookings/
+  PATCH  /api/scheduling/bookings/{id}/
+  GET    /api/scheduling/calendar/{videomaker_id}/?month=&year=
+
+
+──────────────────────────────────────────────────────────────────────────────
+5.6 MÓDULO: CONTRATOS
+──────────────────────────────────────────────────────────────────────────────
+
+Prioridade: MÉDIA  |  Profissionaliza a relação cliente-videomaker
+
+Funcionais:
+  [F-CTR-01] Gerar contrato a partir de um agendamento confirmado
+  [F-CTR-02] Preencher dados completos do contrato (ver seção 5.6.1)
+  [F-CTR-03] Gerar PDF profissional com os dados preenchidos
+  [F-CTR-04] Ambas as partes recebem notificação de contrato pendente
+  [F-CTR-05] Cliente aceita o contrato (registro com timestamp + IP)
+  [F-CTR-06] Videomaker aceita o contrato (registro com timestamp + IP)
+  [F-CTR-07] Contrato só é "Totalmente Aceito" quando ambos aceitam
+  [F-CTR-08] Download do PDF gerado
+  [F-CTR-09] Log completo de aceite para auditoria
+  [F-CTR-10] Status do contrato visível no agendamento
+  [F-CTR-11] Número sequencial do contrato (FH-2026-00047)
+  [F-CTR-12] Hash SHA-256 do documento para integridade
+
+Fluxo de status:
+  draft → pending_acceptance → accepted_by_client → fully_accepted
+                 ↓                                      ↑
+          accepted_by_videomaker ────────────────────────┘
+
+Não-funcionais:
+  [NF-CTR-01] PDF gerado em até 3 segundos após confirmação
+  [NF-CTR-02] PDF armazenado em file system (ou S3 em produção)
+  [NF-CTR-03] Contrato vinculado a um único agendamento (OneToOne)
+  [NF-CTR-04] Template HTML estilizado para PDF
+
+Endpoints:
+  POST   /api/contracts/
+  GET    /api/contracts/{id}/
+  GET    /api/contracts/{id}/pdf/
+  POST   /api/contracts/{id}/accept/
+  POST   /api/contracts/{id}/reject/
+  GET    /api/contracts/by-booking/{booking_id}/
+
+
+──────────────────────────────────────────────────────────────────────────────
+5.6.1 ESTRUTURA DO CONTRATO (MODELO PDF PROFISSIONAL)
+──────────────────────────────────────────────────────────────────────────────
+
+O contrato gerado pelo FilmersHub segue um modelo profissional com 12
+seções padronizadas. O PDF é gerado automaticamente pelo WeasyPrint
+a partir dos dados do agendamento e do preenchimento manual das partes.
+
+Estrutura do contrato:
+
+  CABEÇALHO:
+    - Logo do FilmersHub
+    - Título: "CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE PRODUÇÃO AUDIOVISUAL"
+    - Número do contrato: FH-AAAA-NNNNN
+    - Data de emissão
+    - Plataforma: FilmersHub (www.filmershub.com)
+
+  CLÁUSULA 1 — DAS PARTES:
+    CONTRATANTE (Cliente):
+      - Nome/Razão Social
+      - CPF/CNPJ
+      - Endereço completo (rua, número, complemento, cidade/UF, CEP)
+      - Telefone
+      - Email
+
+    CONTRATADO (Videomaker):
+      - Nome/Razão Social
+      - CPF/CNPJ
+      - Endereço completo
+      - Telefone
+      - Email
+      - Registro FilmersHub (@username)
+
+  CLÁUSULA 2 — DO OBJETO:
+    - Tipo de serviço: Casamento / Evento / Clipe / Publicidade / Outro
+    - Descrição detalhada do serviço
+    - Data do evento
+    - Horário de início e término previsto
+    - Local do evento (endereço completo)
+    - Local de cobertura adicional (se aplicável)
+
+  CLÁUSULA 3 — DAS ESPECIFICAÇÕES TÉCNICAS:
+    Tabela de entregáveis:
+      - Vídeo final (formato, resolução, duração)
+      - Curtas-metragens para redes sociais (formato vertical 9:16)
+      - Fotos selecionadas e editadas (resolução, formato)
+      - Faixa de áudio (se aplicável)
+    - Número de câmeras
+    - Descrição da equipe
+    - Equipamento incluso (câmeras, estabilizador, drone, iluminação)
+
+  CLÁUSULA 4 — DO VALOR E FORMA DE PAGAMENTO:
+    - Valor total por extenso
+    - Tabela de composição do valor:
+        Captação (filmagem) .............. R$ XXXX,XX
+        Pós-produção (edição) ............ R$ XXXX,XX
+        Extras (drone, 2ª câmera) ........ R$ XXXX,XX
+        Deslocamento / hospedagem ........ R$ XXXX,XX
+        ...............................................
+        TOTAL ............................. R$ XXXX,XX
+    - Forma de pagamento:
+        ( ) À vista com desconto
+        ( ) Parcelado
+        ( ) Pagamento via FilmersHub (PIX ou cartão)
+    - Comissão da plataforma (se aplicável)
+
+  CLÁUSULA 5 — DO PRAZO DE ENTREGA:
+    - Material bruto (raw): até X dias após o evento
+    - Primeira versão (rascunho): até X dias após o evento
+    - Versão final (após ajustes): até X dias após aprovação
+    - Máximo de X rodadas de ajustes inclusos
+    - Ajustes adicionais: R$ XX,XX/hora
+    - Meio de entrega (link, pendrive, plataforma)
+
+  CLÁUSULA 6 — DOS DIREITOS AUTORAIS E USO DO MATERIAL:
+    - Direitos autorais permanecem com CONTRATADO até quitação
+    - Após pagamento, CONTRATANTE recebe licença de uso irrestrita
+    - CONTRATADO pode usar material em portfólio (salvo constrangimento)
+    - Sigilo total disponível mediante taxa adicional
+    - Vedada revenda ou redistribuição sem autorização
+
+  CLÁUSULA 7 — DO CANCELAMENTO E REEMBOLSO:
+    Pelo CONTRATANTE:
+      - Mais de 30 dias antes: devolução 100% do sinal
+      - 15 a 30 dias antes: devolução 50% do sinal
+      - Menos de 15 dias: sem devolução
+      - No dia: pagamento integral devido
+    Pelo CONTRATADO:
+      - Indicar profissional substituto OU devolver 100%
+      - Força maior: reembolso integral com comprovação
+    Remarcação:
+      - Uma vez, aviso mínimo 15 dias, taxa se aplicável
+
+  CLÁUSULA 8 — DA CONFIDENCIALIDADE:
+    - Sigilo sobre informações pessoais e financeiras
+    - Divulgação do material só com autorização escrita
+    - Vigência: X anos após término do contrato
+
+  CLÁUSULA 9 — DA RESPONSABILIDADE:
+    - CONTRATADO responde por negligência, imperícia, imprudência
+    - Excluído por força maior ou caso fortuito
+    - CONTRATANTE garante acesso adequado ao local
+    - Responsabilidade civil limitada ao valor do contrato
+
+  CLÁUSULA 10 — DA RESOLUÇÃO DE CONFLITOS:
+    - Prioridade para resolução diplomática
+    - Foro da comarca de [CIDADE/UF]
+    - FilmersHub pode atuar como mediadora (sem responsabilidade)
+
+  CLÁUSULA 11 — DAS DISPOSIÇÕES GERAIS:
+    - Regido pelas leis do Brasil
+    - Aceite digital com validade jurídica (MP 2.200-2/2001,
+      Lei 14.063/2020)
+    - Registro de aceite com timestamp, IP e dados do usuário
+    - Alterações só por escrito e aceitas por ambas as partes
+    - Nulidade de cláusula não compromete o restante
+
+  CLÁUSULA 12 — DAS ASSINATURAS E ACEITE DIGITAL:
+    - Espaço para assinatura do CONTRATANTE
+      Nome: _________________ CPF/CNPJ: _________________
+      Aceite: [DATA/HORA] IP: [XXX.XXX.XXX.XXX]
+    - Espaço para assinatura do CONTRATADO
+      Nome: _________________ CPF/CNPJ: _________________
+      Aceite: [DATA/HORA] IP: [XXX.XXX.XXX.XXX]
+    - Espaço para 2 testemunhas
+      Testemunha 1: Nome: _________________ CPF: _________________
+      Testemunha 2: Nome: _________________ CPF: _________________
+
+  RODAPÉ:
+    - "Documento gerado automaticamente pela plataforma FilmersHub"
+    - "Contrato válido com aceite digital de ambas as partes"
+    - Número do contrato
+    - Hash SHA-256 do documento
+
+  TEMPLATE:
+    Arquivo: backend/apps/contracts/templates/contracts/contract_pdf.html
+    Gerador: backend/apps/contracts/pdf_generator.py (WeasyPrint)
+    CSS dedicado para formatação profissional
+
+  MODEL DO BANCO (Contract — campos expandidos):
+    # Identificação
+    contract_number        CharField(unique)    # FH-2026-00047
+    document_hash          CharField(blank)     # SHA-256
+
+    # Partes (snapshots no momento do contrato)
+    client                 ForeignKey(User)
+    videomaker             ForeignKey(User)
+    client_full_name       CharField
+    client_document_type   CharField
+    client_document_number CharField
+    client_address         TextField(blank)
+    client_phone           CharField
+    videomaker_full_name   CharField
+    videomaker_document_type CharField
+    videomaker_document_number CharField
+    videomaker_address     TextField(blank)
+    videomaker_phone       CharField
+
+    # Objeto
+    booking                OneToOneField(Booking)
+    service_type           CharField
+    service_description    TextField
+    event_date             DateField
+    event_start_time       TimeField
+    event_end_time         TimeField
+    event_location         TextField
+
+    # Especificações técnicas
+    cameras_count          PositiveIntegerField
+    team_description       TextField(blank)
+    equipment_included     TextField(blank)
+    deliverables           JSONField
+
+    # Valor e pagamento
+    total_price            DecimalField
+    price_breakdown        JSONField
+    payment_method         CharField
+    payment_terms          TextField(blank)
+
+    # Prazo de entrega
+    delivery_deadline_days PositiveIntegerField
+    draft_deadline_days    PositiveIntegerField
+    revision_rounds_included PositiveIntegerField
+
+    # Direitos autorais
+    portfolio_use_allowed  BooleanField
+    confidentiality_requested BooleanField
+    confidentiality_years  PositiveIntegerField
+
+    # Cancelamento
+    cancellation_terms     TextField(blank)
+
+    # Status e aceite
+    status                 CharField
+    accepted_by_client_at  DateTimeField(nullable)
+    accepted_by_client_ip  GenericIPAddressField(nullable)
+    accepted_by_videomaker_at DateTimeField(nullable)
+    accepted_by_videomaker_ip GenericIPAddressField(nullable)
+
+    # Arquivo
+    pdf_file               FileField
+
+    # Timestamps
+    created_at             DateTimeField
+    updated_at             DateTimeField
+
+
+──────────────────────────────────────────────────────────────────────────────
+5.7 MÓDULO: PAGAMENTO
+──────────────────────────────────────────────────────────────────────────────
+
+Prioridade: MÉDIA  |  Monetização da plataforma
+
+Modelo de negócio:
+  - Comissão de 15% sobre cada contrato fechado (mínimo R$10,00)
+  - Pagamento processado via Mercado Pago (split automático)
+  - Repasse ao videomaker com holding de 14 dias
+
+Funcionais:
+  [F-PAY-01] Videomaker vincula conta Mercado Pago via OAuth
+  [F-PAY-02] Sistema gera pagamento via PIX (QR Code) ou cartão de crédito
+  [F-PAY-03] Checkout transparente dentro do FilmersHub (sem redirecionar)
+  [F-PAY-04] Webhook confirma pagamento automaticamente
+  [F-PAY-05] Split automático: 85% videomaker / 15% FilmersHub
+  [F-PAY-06] Histórico de pagamentos para ambas as partes
+  [F-PAY-07] Status do pagamento visível no contrato
+  [F-PAY-08] Holding de 14 dias antes do repasse ao videomaker
+  [F-PAY-09] Comprovante de pagamento enviado por email
+  [F-PAY-10] Reembolso via admin (quando aprovado pelo sistema)
+
+Fluxo:
+  1. Contrato totalmente aceito
+  2. Botão "PAGAR" aparece para o cliente
+  3. Cliente seleciona PIX ou cartão
+  4. Pagamento processado via Mercado Pago
+  5. Webhook confirma → status atualiza
+  6. Split automático: 85% videomaker / 15% plataforma
+  7. Após 14 dias, videomaker pode sacar
+
+Não-funcionais:
+  [NF-PAY-01] PIX: aprovação instantânea
+  [NF-PAY-02] Cartão: processamento em até 3 dias
+  [NF-PAY-03] Webhook deve ser idempotente (evitar processar 2x)
+  [NF-PAY-04] Valores armazenados com 2 casas decimais
+
+Endpoints:
+  POST   /api/payments/create/
+  POST   /api/payments/webhook/
+  GET    /api/payments/{contract_id}/
+  POST   /api/payments/link-mp/
+  GET    /api/payments/history/
+  POST   /api/payments/refund/{id}/
+
+
+──────────────────────────────────────────────────────────────────────────────
+5.8 MÓDULO: NOTIFICAÇÕES
+──────────────────────────────────────────────────────────────────────────────
+
+Prioridade: MÉDIA  |  Engajamento e retenção
+
+Canais: In-app (badge + lista) + Email (SendGrid)
+
+Eventos que geram notificação:
+  ┌─────────────────────────────────┬──────────────┬─────────┐
+  │ Evento                          │ In-app       │ Email   │
+  ├─────────────────────────────────┼──────────────┼─────────┤
+  │ Nova mensagem no chat           │ Sim          │ Não     │
+  │ Solicitação de agendamento      │ Sim          │ Sim     │
+  │ Agendamento confirmado          │ Sim          │ Sim     │
+  │ Agendamento rejeitado           │ Sim          │ Sim     │
+  │ Contrato pendente de aceite     │ Sim          │ Sim     │
+  │ Contrato totalmente aceito      │ Sim          │ Sim     │
+  │ Pagamento recebido              │ Sim          │ Sim     │
+  │ Novo comentário no post         │ Sim          │ Não     │
+  │ Curtida no post                 │ Sim          │ Não     │
+  │ Confirmação de cadastro         │ Não          │ Sim     │
+  └─────────────────────────────────┴──────────────┴─────────┘
+
+Funcionais:
+  [F-NTF-01] Badge de contagem de não-lidas na navbar
+  [F-NTF-02] Painel de notificações (dropdown ou página)
+  [F-NTF-03] Marcar notificação como lida
+  [F-NTF-04] Marcar todas como lidas
+  [F-NTF-05] Preferências de notificação (quais eventos geram email)
+  [F-NTF-06] Templates de email transacionais (SendGrid)
+  [F-NTF-07] Notificação in-app em tempo real via WebSocket
+  [F-NTF-08] Link direto para o item notificado (post, booking, etc)
+  [F-NTF-09] Limpeza automática de notificações antigas (>90 dias)
+
+Não-funcionais:
+  [NF-NTF-01] Notificações in-app armazenadas no PostgreSQL
+  [NF-NTF-02] Badge atualiza em tempo real via WebSocket
+  [NF-NTF-03] Emails enviados em background (async)
+  [NF-NTF-04] Máximo de 200 notificações por usuário (limpar antigas)
+
+Endpoints:
+  GET    /api/notifications/
+  POST   /api/notifications/{id}/read/
+  POST   /api/notifications/read-all/
+  GET    /api/notifications/preferences/
+  PATCH  /api/notifications/preferences/
+
+
+──────────────────────────────────────────────────────────────────────────────
+5.9 MÓDULO: TESTES
+──────────────────────────────────────────────────────────────────────────────
+
+Prioridade: MÉDIA  |  Qualidade e portfólio
+
+Cobertura mínima (37 cenários):
+
+  accounts/ (6 cenários):
+    - Registro com dados válidos → 201
+    - Registro com CPF inválido → 400
+    - Registro com email duplicado → 400
+    - Login com credenciais corretas → 200 + tokens
+    - Login com credenciais erradas → 401
+    - Confirmação de email (token válido → 200, expirado → 400)
+
+  portfolio/ (4 cenários):
+    - Criar item com URL YouTube válida → 201
+    - Criar item com URL inválida → 400
+    - Listar portfólio de outro usuário → 200
+    - Deletar item de outro usuário → 403
+
+  feed/ (4 cenários):
+    - Criar post → 201
+    - Curtir/descurtir toggle → 200
+    - Comentar → 201
+    - Deletar post de outro → 403
+
+  chat/ (4 cenários):
+    - Criar conversa 1:1 → 201
+    - Enviar mensagem → 201
+    - Listar mensagens → 200
+    - Acesso de não-membro → 403
+
+  scheduling/ (4 cenários):
+    - Criar disponibilidade → 201
+    - Criar booking com conflito → 400
+    - Confirmar booking → 200
+    - Rejeitar booking → 200
+
+  contracts/ (4 cenários):
+    - Gerar contrato de booking confirmado → 201
+    - Aceite de ambas as partes → 200
+    - Status inválido → 400
+    - Download PDF → 200
+
+  payments/ (4 cenários):
+    - Criar pagamento → 201
+    - Webhook idempotente → 200
+    - Status do pagamento → 200
+    - Reembolso sem permissão → 403
+
+  notifications/ (3 cenários):
+    - Criar notificação → 201
+    - Marcar como lida → 200
+    - Preferências → 200
+
+Framework:
+  - Backend: pytest-django + DRF APITestCase
+  - Frontend: Vitest + React Testing Library
+
+Comandos:
+  backend:  pytest --tb=short -q
+  frontend: npm run test
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. TELAS DO FRONTEND
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌────────────────────────────────┬──────────────────────────┬─────────────────┐
+│ Rota                           │ Tela                     │ Módulo          │
+├────────────────────────────────┼──────────────────────────┼─────────────────┤
+│ /                              │ Landing page             │ Marketing       │
+│ /login                         │ Login                    │ Auth            │
+│ /register                      │ Cadastro (wizard)        │ Auth            │
+│ /register/step-1               │ Dados pessoais           │ Auth            │
+│ /register/step-2               │ Documento CPF/CNPJ       │ Auth            │
+│ /register/step-3               │ Senha + termos           │ Auth            │
+│ /register/confirm              │ Email pendente           │ Auth            │
+│ /complete-profile              │ Perfil profissional      │ Auth            │
+│ /feed                          │ Feed social              │ Feed            │
+│ /profile/:username             │ Perfil do usuário        │ Auth+Portfolio  │
+│ /profile/edit                  │ Editar perfil            │ Auth            │
+│ /portfolio                     │ Meu portfólio            │ Portfolio       │
+│ /portfolio/:username           │ Portfólio público        │ Portfolio       │
+│ /chat                          │ Lista de conversas       │ Chat            │
+│ /chat/:id                      │ Conversa                 │ Chat            │
+│ /schedule                      │ Minha agenda             │ Scheduling      │
+│ /schedule/:username            │ Agenda do videomaker     │ Scheduling      │
+│ /contracts                     │ Lista de contratos       │ Contracts       │
+│ /contracts/:id                 │ Detalhe do contrato      │ Contracts       │
+│ /payments/checkout/:id         │ Pagamento do serviço     │ Payments        │
+│ /payments/history              │ Histórico de pagamentos  │ Payments        │
+│ /notifications                 │ Notificações             │ Notifications   │
+│ /videomakers                   │ Explorar videomakers     │ Auth (busca)    │
+│ /settings/link-mp              │ Vincular Mercado Pago    │ Payments        │
+│ /api/docs/                     │ Swagger UI               │ API Docs        │
+│ /api/redoc/                    │ ReDoc                   │ API Docs        │
+└────────────────────────────────┴──────────────────────────┴─────────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. MODELOS DO BANCO DE DADOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+App: accounts
+  User (AbstractUser)
+    ├── email                   EmailField(unique)
+    ├── is_email_confirmed      BooleanField(default=False)
+    ├── email_confirmation_token CharField(blank)
+    ├── full_name               CharField(max_length=200)
+    ├── phone                   CharField(max_length=20)
+    ├── document_type           CharField(choices=cpf/cnpj)
+    ├── document_number         CharField(unique)
+    ├── company_name            CharField(blank)
+    ├── avatar                  ImageField(blank)
+    ├── bio                     TextField(blank)
+    └── location                CharField(blank)
+
+  VideomakerProfile
+    ├── user                    OneToOneField(User)
+    ├── specialties             JSONField(list)
+    ├── hourly_rate             DecimalField(nullable)
+    ├── years_experience        PositiveIntegerField
+    ├── portfolio_link          URLField(blank)
+    └── is_available            BooleanField(default=True)
+
+  ClientProfile
+    ├── user                    OneToOneField(User)
+    └── company_name            CharField(blank)
+
+App: portfolio
+  PortfolioItem
+    ├── user                    ForeignKey(User)
+    ├── title                   CharField
+    ├── description             TextField
+    ├── video_url               URLField
+    ├── category                CharField(choices)
+    ├── thumbnail               ImageField(blank)
+    └── is_featured             BooleanField
+
+App: feed
+  Post
+    ├── author                  ForeignKey(User)
+    ├── content                 TextField
+    ├── video_url               URLField(nullable)
+    ├── image                   ImageField(blank)
+    ├── created_at              DateTimeField
+    └── updated_at              DateTimeField
+
+  PostLike
+    ├── post                    ForeignKey(Post)
+    ├── user                    ForeignKey(User)
+    └── unique_together         (post, user)
+
+  PostComment
+    ├── post                    ForeignKey(Post)
+    ├── user                    ForeignKey(User)
+    ├── content                 TextField
+    └── created_at              DateTimeField
+
+App: chat
+  Conversation
+    ├── conversation_type       CharField(direct/group)
+    ├── name                    CharField(blank)
+    └── created_by              ForeignKey(User)
+
+  ConversationMember
+    ├── conversation            ForeignKey(Conversation)
+    ├── user                    ForeignKey(User)
+    └── unique_together         (conversation, user)
+
+  Message
+    ├── conversation            ForeignKey(Conversation)
+    ├── sender                  ForeignKey(User)
+    ├── content                 TextField
+    ├── created_at              DateTimeField
+    └── read_by                 ManyToManyField(User)
+
+App: scheduling
+  Availability
+    ├── videomaker             ForeignKey(User)
+    ├── date                   DateField(nullable)
+    ├── day_of_week            IntegerField(nullable)
+    ├── start_time             TimeField
+    └── end_time               TimeField
+
+  Booking
+    ├── videomaker             ForeignKey(User)
+    ├── client                 ForeignKey(User)
+    ├── date                   DateField
+    ├── start_time             TimeField
+    ├── end_time               TimeField
+    ├── event_location         CharField(blank)
+    ├── description            TextField
+    ├── status                 CharField(pending/confirmed/completed/cancelled)
+    ├── created_at             DateTimeField
+    └── updated_at             DateTimeField
+
+App: contracts
+  Contract
+    ├── contract_number        CharField(unique)
+    ├── document_hash          CharField(blank)
+    ├── client                 ForeignKey(User)
+    ├── videomaker             ForeignKey(User)
+    ├── client_full_name       CharField
+    ├── client_document_type   CharField
+    ├── client_document_number CharField
+    ├── client_address         TextField(blank)
+    ├── client_phone           CharField
+    ├── videomaker_full_name   CharField
+    ├── videomaker_document_type CharField
+    ├── videomaker_document_number CharField
+    ├── videomaker_address     TextField(blank)
+    ├── videomaker_phone       CharField
+    ├── booking                OneToOneField(Booking)
+    ├── service_type           CharField
+    ├── service_description    TextField
+    ├── event_date             DateField
+    ├── event_start_time       TimeField
+    ├── event_end_time         TimeField
+    ├── event_location         TextField
+    ├── cameras_count          PositiveIntegerField(default=1)
+    ├── team_description       TextField(blank)
+    ├── equipment_included     TextField(blank)
+    ├── deliverables           JSONField
+    ├── total_price            DecimalField
+    ├── price_breakdown        JSONField
+    ├── payment_method         CharField
+    ├── payment_terms          TextField(blank)
+    ├── delivery_deadline_days PositiveIntegerField(default=30)
+    ├── draft_deadline_days    PositiveIntegerField(default=14)
+    ├── revision_rounds_included PositiveIntegerField(default=2)
+    ├── portfolio_use_allowed  BooleanField(default=True)
+    ├── confidentiality_requested BooleanField(default=False)
+    ├── confidentiality_years  PositiveIntegerField(default=2)
+    ├── cancellation_terms     TextField(blank)
+    ├── status                 CharField
+    ├── accepted_by_client_at  DateTimeField(nullable)
+    ├── accepted_by_client_ip  GenericIPAddressField(nullable)
+    ├── accepted_by_videomaker_at DateTimeField(nullable)
+    ├── accepted_by_videomaker_ip GenericIPAddressField(nullable)
+    ├── pdf_file               FileField
+    ├── created_at             DateTimeField
+    └── updated_at             DateTimeField
+
+  ContractAcceptanceLog
+    ├── contract               ForeignKey(Contract)
+    ├── user                   ForeignKey(User)
+    ├── action                 CharField
+    ├── timestamp              DateTimeField
+    └── ip_address             GenericIPAddressField(nullable)
+
+App: payments
+  Payment
+    ├── contract               OneToOneField(Contract)
+    ├── payer                  ForeignKey(User)
+    ├── payee                  ForeignKey(User)
+    ├── amount                 DecimalField
+    ├── platform_fee           DecimalField
+    ├── net_amount             DecimalField
+    ├── payment_method         CharField(pix/credit_card)
+    ├── mercadopago_id         CharField(unique)
+    ├── status                 CharField(pending/approved/rejected/refunded/cancelled)
+    ├── paid_at                DateTimeField(nullable)
+    └── created_at             DateTimeField
+
+  PlatformConfig (singleton)
+    ├── commission_percentage  DecimalField(default=15.00)
+    ├── min_commission         DecimalField(default=10.00)
+    └── updated_at             DateTimeField
+
+  Payout
+    ├── videomaker             ForeignKey(User)
+    ├── amount                 DecimalField
+    ├── status                 CharField(pending/processed/failed)
+    ├── processed_at           DateTimeField(nullable)
+    └── created_at             DateTimeField
+
+App: notifications
+  Notification
+    ├── user                   ForeignKey(User)
+    ├── notification_type      CharField(choices)
+    ├── title                  CharField
+    ├── message                TextField
+    ├── link                   CharField(blank)
+    ├── is_read                BooleanField(default=False)
+    ├── read_at                DateTimeField(nullable)
+    └── created_at             DateTimeField
+
+  NotificationPreference
+    ├── user                   OneToOneField(User)
+    ├── new_message            BooleanField(default=True)
+    ├── booking_request        BooleanField(default=True)
+    ├── booking_update         BooleanField(default=True)
+    ├── contract_pending       BooleanField(default=True)
+    ├── contract_accepted      BooleanField(default=True)
+    ├── payment_received       BooleanField(default=True)
+    ├── post_comment           BooleanField(default=True)
+    ├── post_like              BooleanField(default=True)
+    ├── email_notifications    BooleanField(default=True)
+    └── updated_at             DateTimeField
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. ORDEM DE IMPLEMENTAÇÃO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fase 1 - Fundação (Semanas 1-2):
+  [x] Setup do projeto (Django + React + Docker)
+  [x] Modelagem do banco
+  [x] Autenticação (wizard 3 etapas, JWT, confirmação email)
+  [x] CRUD de perfis
+
+Fase 2 - Portfólio e Feed (Semanas 3-4):
+  [ ] CRUD de portfólio
+  [ ] Página de portfólio público
+  [ ] CRUD de posts no feed
+  [ ] Likes e comentários
+
+Fase 3 - Comunicação (Semanas 5-6):
+  [ ] Chat 1:1 (REST + WebSocket)
+  [ ] Chat em grupo
+  [ ] Indicador de digitando / não-lidos
+
+Fase 4 - Agendamento e Contratos (Semanas 7-8):
+  [ ] CRUD de disponibilidade
+  [ ] Fluxo de agendamento (solicitar → confirmar)
+  [ ] Template HTML do contrato
+  [ ] Geração de PDF profissional
+  [ ] Fluxo de aceite digital
+
+Fase 5 - Pagamento e Notificações (Semanas 9-10):
+  [ ] Vinculação Mercado Pago (OAuth)
+  [ ] Checkout PIX/cartão
+  [ ] Webhook de confirmação
+  [ ] Split de pagamento
+  [ ] Sistema de notificações in-app
+  [ ] Templates de email (SendGrid)
+
+Fase 6 - Polish e Testes (Semana 11):
+  [ ] Busca de videomakers
+  [ ] Testes automatizados
+  [ ] Responsividade mobile
+  [ ] Deploy (Vercel + Railway + Neon)
+  [ ] README profissional
+  [ ] Ajustes finais
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. REGRAS DE NEGÓCIO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+R-01: Um usuário pode ter perfil Videomaker, Cliente, ou ambos.
+R-02: Apenas Videomakers podem criar itens de portfólio.
+R-03: Apenas Clientes podem solicitar agendamentos.
+R-04: Slots de disponibilidade não podem ter conflito de horário.
+R-05: Contrato só é gerado a partir de agendamento confirmado.
+R-06: Contrato é "Totalmente Aceito" somente quando ambas as partes aceitam.
+R-07: Mensagens são visíveis apenas para participantes da conversa.
+R-08: Usuário pode excluir apenas seus próprios posts.
+R-09: Videomaker pode cancelar agendamento com aviso prévio de 24h.
+R-10: PDF inclui timestamp de cada aceite para auditoria.
+R-11: Videomaker deve vincular conta Mercado Pago antes de receber pagamentos.
+R-12: Comissão padrão é 15% sobre o valor do contrato (mínimo R$10).
+R-13: PIX tem aprovação imediata; cartão pode levar até 3 dias.
+R-14: Repasse ao videomaker tem holding de 14 dias.
+R-15: Reembolso é solicitado pelo cliente, com aprovação do admin.
+R-16: Token de confirmação de email expira em 24h.
+R-17: Máximo de 5 tentativas de login por minuto.
+R-18: Número do contrato é sequencial (FH-AAAA-NNNNN).
+R-19: Contratos devem ter snapshot dos dados das partes no momento da criação.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. PADRÕES DA API
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+──────────────────────────────────────────────────────────────────────────────
+10.1 FORMATO DE RESPOSTA (SUCESSO)
+──────────────────────────────────────────────────────────────────────────────
+
+  Objeto único:
+    {
+      "id": 1,
+      "field": "value",
+      ...
+    }
+
+  Lista com paginação:
+    {
+      "count": 150,
+      "next": "http://api/api/users/?page=3",
+      "previous": "http://api/api/users/?page=1",
+      "results": [
+        { "id": 1, ... },
+        { "id": 2, ... }
+      ]
+    }
+
+
+──────────────────────────────────────────────────────────────────────────────
+10.2 FORMATO DE ERRO PADRONIZADO
+──────────────────────────────────────────────────────────────────────────────
+
+  Erro de validação (400):
+    {
+      "error": {
+        "code": "VALIDATION_ERROR",
+        "message": "Dados inválidos",
+        "details": {
+          "email": ["Este email já está cadastrado"],
+          "document_number": ["CPF inválido"]
+        }
+      }
+    }
+
+  Erro de autenticação (401):
+    {
+      "error": {
+        "code": "AUTHENTICATION_REQUIRED",
+        "message": "Credenciais inválidas ou token expirado"
+      }
+    }
+
+  Erro de permissão (403):
+    {
+      "error": {
+        "code": "PERMISSION_DENIED",
+        "message": "Você não tem permissão para acessar este recurso"
+      }
+    }
+
+  Erro não encontrado (404):
+    {
+      "error": {
+        "code": "NOT_FOUND",
+        "message": "Recurso não encontrado"
+      }
+    }
+
+  Erro interno (500):
+    {
+      "error": {
+        "code": "INTERNAL_ERROR",
+        "message": "Erro interno do servidor"
+      }
+    }
+
+
+──────────────────────────────────────────────────────────────────────────────
+10.3 PAGINAÇÃO
+──────────────────────────────────────────────────────────────────────────────
+
+  Offset-based (padrão DRF):
+    GET /api/users/?page=2&page_size=20
+
+  Filtros comuns:
+    GET /api/videomakers/?specialty=wedding&location=São+Paulo
+    GET /api/feed/?page=1
+    GET /api/portfolio/{user_id}/?category=event
+
+
+──────────────────────────────────────────────────────────────────────────────
+10.4 AUTENTICAÇÃO (JWT HEADERS)
+──────────────────────────────────────────────────────────────────────────────
+
+  Requisições autenticadas devem incluir:
+    Authorization: Bearer <access_token>
+
+  Exemplo:
+    curl -H "Authorization: Bearer eyJhbGciOi..." http://api/api/users/me/
+
+  Tokens:
+    - Access token: 30 minutos de validade
+    - Refresh token: 7 dias de validade
+    - Renovação: POST /api/auth/token/refresh/ com refresh token
+
+
+──────────────────────────────────────────────────────────────────────────────
+10.5 DOCUMENTAÇÃO (SWAGGER/SPECTACULAR)
+──────────────────────────────────────────────────────────────────────────────
+
+  Ferramenta: drf-spectacular (OpenAPI 3.0)
+
+  Endpoints de documentação:
+    GET /api/docs/    → Swagger UI (interativo, pode testar endpoints)
+    GET /api/redoc/   → ReDoc (documentação elegante e limpa)
+    GET /api/schema/  → Schema OpenAPI 3.0 (JSON/YAML)
+
+  Configuração:
+    INSTALLED_APPS += ['drf_spectacular']
+    REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
+
+  Cada ViewSet deve ter:
+    schema = AutoSchema(
+        tags=['auth'],  # agrupa por módulo na UI
+        ...
+    )
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11. UPLOAD DE ARQUIVOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+──────────────────────────────────────────────────────────────────────────────
+11.1 LIMITES POR TIPO
+──────────────────────────────────────────────────────────────────────────────
+
+  ┌──────────────────────────┬──────────┬───────────────────────────────────┐
+  │ Tipo                     │ Tamanho  │ Formatos aceitos                  │
+  ├──────────────────────────┼──────────┼───────────────────────────────────┤
+  │ Avatar (foto perfil)     │ 5 MB     │ JPG, PNG, WebP                    │
+  │ Imagem do post (feed)    │ 10 MB    │ JPG, PNG, WebP, GIF               │
+  │ Thumbnail (portfólio)    │ 5 MB     │ JPG, PNG, WebP                    │
+  │ Imagem de capa           │ 10 MB    │ JPG, PNG, WebP                    │
+  └──────────────────────────┴──────────┴───────────────────────────────────┘
+
+  Nota: Vídeos NÃO são enviados diretamente — apenas URLs do YouTube/Vimeo.
+  Contratos PDF são gerados pelo sistema, não enviados pelo usuário.
+
+
+──────────────────────────────────────────────────────────────────────────────
+11.2 TRATAMENTO DE ERROS
+──────────────────────────────────────────────────────────────────────────────
+
+  Quando o arquivo excede o limite:
+    {
+      "error": {
+        "code": "FILE_TOO_LARGE",
+        "message": "Arquivo excede o limite de 5MB"
+      }
+    }
+
+  Quando o formato é inválido:
+    {
+      "error": {
+        "code": "INVALID_FILE_FORMAT",
+        "message": "Formato não aceito. Use: JPG, PNG ou WebP"
+      }
+    }
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+12. CACHE E PERFORMANCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+──────────────────────────────────────────────────────────────────────────────
+12.1 ESTRATÉGIA DE CACHE REDIS
+──────────────────────────────────────────────────────────────────────────────
+
+  ┌──────────────────────────────┬────────┬────────────────────────────────┐
+  │ Dado                         │ TTL    │ Chave de cache                 │
+  ├──────────────────────────────┼────────┼────────────────────────────────┤
+  │ Lista de videomakers         │ 5 min  │ videomakers:{page}:{filters}   │
+  │ Portfólio público            │ 10 min │ portfolio:{user_id}            │
+  │ Dados do perfil público      │ 10 min │ profile:{user_id}              │
+  │ Detalhe do post              │ 5 min  │ post:{post_id}                 │
+  │ Configuração de comissão     │ 30 min │ platform:config                │
+  │ Contador de não-lidos (chat) │ 1 min  │ unread:{user_id}               │
+  └──────────────────────────────┴────────┴────────────────────────────────┘
+
+  Invalidação:
+    - Ao criar/editar/deletar um item, invalidar o cache correspondente
+    - Usar signal no Django ou decorator customizado
+    - Ex: @cache_page(60 * 5) para cache de 5 minutos
+
+
+──────────────────────────────────────────────────────────────────────────────
+12.2 LAZY LOADING E CODE SPLITTING
+──────────────────────────────────────────────────────────────────────────────
+
+  Frontend:
+    - React.lazy() para carregar páginas sob demanda
+    - Suspense com fallback de Skeleton (usando Card Shimmer)
+    - Imagens com loading="lazy" nativo
+    - Infinite scroll no feed e chat (carregar mais sob demanda)
+
+  Backend:
+    - Select_related / Prefetch_related para evitar N+1 queries
+    - Paginação em todas as listas
+    - Fields() nos serializers para retornar apenas o necessário
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+13. DEPLOY E CI/CD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+──────────────────────────────────────────────────────────────────────────────
+13.1 SERVIÇOS (CUSTO ZERO PARA PORTFÓLIO)
+──────────────────────────────────────────────────────────────────────────────
+
+  ┌──────────────────┬────────────────────┬──────────────────────────────────┐
+  │ Serviço          │ Plataforma         │ Uso                              │
+  ├──────────────────┼────────────────────┼──────────────────────────────────┤
+  │ Frontend         │ Vercel             │ Deploy automático do React       │
+  │ Backend          │ Railway ou Render  │ Deploy do Django + DRF           │
+  │ PostgreSQL       │ Neon ou Supabase   │ Banco de dados (500MB grátis)    │
+  │ Redis            │ Upstash            │ Cache + Channels (10K cmds grátis)│
+  │ Armazenamento    │ Cloudinary         │ Upload de imagens (25GB grátis)  │
+  │ Email            │ SendGrid           │ Transacional (100 emails/dia)    │
+  │ CDN              │ Cloudflare         │ SSL + cache estático             │
+  │ Versionamento    │ GitHub             │ Código fonte + Issues            │
+  │ CI/CD            │ GitHub Actions     │ Testes automáticos no push       │
+  └──────────────────┴────────────────────┴──────────────────────────────────┘
+
+
+──────────────────────────────────────────────────────────────────────────────
+13.2 GITHUB ACTIONS (TESTES AUTOMÁTICOS)
+──────────────────────────────────────────────────────────────────────────────
+
+  Arquivo: .github/workflows/test.yml
+
+  Trigger:
+    - Push para main ou develop
+    - Pull request para main
+
+  Jobs:
+    1. Backend tests:
+       - Setup Python 3.12
+       - Instalar dependências (requirements/development.txt)
+       - Rodar pytest
+       - Reportar cobertura
+
+    2. Frontend tests:
+       - Setup Node 20
+       - npm install
+       - npm run test
+       - npm run lint
+
+    3. Lint (opcional):
+       - ruff check (backend)
+       - eslint (frontend)
+
+
+──────────────────────────────────────────────────────────────────────────────
+13.3 VARIÁVEIS DE AMBIENTE POR AMBIENTE
+──────────────────────────────────────────────────────────────────────────────
+
+  Desenvolvimento (local):
+    DJANGO_DEBUG=True
+    EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+    DATABASE_URL=postgres://user:password@localhost:5432/filmershub
+
+  Produção (Railway/Vercel):
+    DJANGO_DEBUG=False
+    EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+    DATABASE_URL=postgres://... (Neon)
+    REDIS_URL=redis://... (Upstash)
+    ALLOWED_HOSTS=filmershub.up.railway.app
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+14. DEPENDÊNCIAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Backend (requirements/base.txt):
+  django>=5.0,<6.0
+  djangorestframework>=3.15
+  djangorestframework-simplejwt>=5.3
+  drf-spectacular>=0.27
+  django-cors-headers>=4.3
+  channels>=4.0
+  daphne>=4.0
+  channels-redis>=4.2
+  psycopg2-binary>=2.9
+  Pillow>=10.0
+  weasyprint>=60.0
+  python-decouple>=3.8
+  mercadopago>=2.3
+  django-extensions>=3.2
+  sendgrid>=6.0
+
+Backend (requirements/development.txt):
+  -r base.txt
+  faker>=24.0
+  django-debug-toolbar>=4.3
+  pytest-django>=4.8
+  pytest-cov>=5.0
+  factory-boy>=3.3
+
+Frontend (package.json):
+  react: ^18.3
+  react-dom: ^18.3
+  react-router-dom: ^6.23
+  axios: ^1.7
+  zustand: ^4.5
+  tailwindcss: ^3.4
+  lucide-react: ^0.378
+  @mercadopago/sdk-js
+
+Frontend (devDependencies):
+  vitest: ^1.6
+  @testing-library/react: ^15.0
+  @testing-library/jest-dom: ^6.4
+  typescript: ^5.4
+  @types/react: ^18.3
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+15. VARIÁVEIS DE AMBIENTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  # Django
+  DJANGO_SECRET_KEY=
+  DJANGO_DEBUG=True
+  DJANGO_SETTINGS_MODULE=config.settings.development
+  ALLOWED_HOSTS=localhost,127.0.0.1
+
+  # Banco de dados
+  DATABASE_URL=postgres://user:password@localhost:5432/filmershub
+
+  # Redis
+  REDIS_URL=redis://localhost:6379/0
+
+  # CORS
+  CORS_ALLOWED_ORIGINS=http://localhost:5173
+
+  # JWT
+  JWT_ACCESS_TOKEN_LIFETIME=30       # minutos
+  JWT_REFRESH_TOKEN_LIFETIME=10080   # minutos (7 dias)
+
+  # Mercado Pago
+  MERCADOPAGO_ACCESS_TOKEN=
+  MERCADOPAGO_PUBLIC_KEY=
+  MERCADOPAGO_WEBHOOK_SECRET=
+  PLATFORM_COMMISSION_PERCENTAGE=15.00
+
+  # SendGrid
+  SENDGRID_API_KEY=
+  SENDGRID_DEFAULT_FROM=noreply@filmershub.com
+
+  # Email (dev)
+  EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+
+  # Cloudinary (uploads - opcional)
+  CLOUDINARY_CLOUD_NAME=
+  CLOUDINARY_API_KEY=
+  CLOUDINARY_API_SECRET=
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+16. ESTRUTURA DE PASTAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+filmershub/
+├── backend/
+│   ├── manage.py
+│   ├── requirements/
+│   │   ├── base.txt
+│   │   ├── development.txt
+│   │   └── production.txt
+│   ├── config/
+│   │   ├── settings/
+│   │   │   ├── base.py
+│   │   │   ├── development.py
+│   │   │   └── production.py
+│   │   ├── urls.py
+│   │   ├── asgi.py
+│   │   ├── wsgi.py
+│   │   └── routing.py
+│   ├── apps/
+│   │   ├── accounts/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── views.py
+│   │   │   ├── urls.py
+│   │   │   ├── permissions.py
+│   │   │   ├── validators.py
+│   │   │   ├── signals.py
+│   │   │   ├── tokens.py
+│   │   │   └── migrations/
+│   │   ├── portfolio/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── views.py
+│   │   │   ├── urls.py
+│   │   │   ├── permissions.py
+│   │   │   └── migrations/
+│   │   ├── feed/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── views.py
+│   │   │   ├── urls.py
+│   │   │   ├── permissions.py
+│   │   │   └── migrations/
+│   │   ├── chat/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── views.py
+│   │   │   ├── urls.py
+│   │   │   ├── permissions.py
+│   │   │   ├── consumers.py
+│   │   │   ├── routing.py
+│   │   │   └── migrations/
+│   │   ├── scheduling/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── views.py
+│   │   │   ├── urls.py
+│   │   │   ├── permissions.py
+│   │   │   └── migrations/
+│   │   ├── contracts/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── views.py
+│   │   │   ├── urls.py
+│   │   │   ├── permissions.py
+│   │   │   ├── pdf_generator.py
+│   │   │   ├── templates/
+│   │   │   │   └── contracts/
+│   │   │   │       ├── contract_pdf.html
+│   │   │   │       └── css/
+│   │   │   │           └── contract.css
+│   │   │   └── migrations/
+│   │   ├── payments/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── views.py
+│   │   │   ├── urls.py
+│   │   │   ├── mercadopago_client.py
+│   │   │   ├── webhooks.py
+│   │   │   └── migrations/
+│   │   └── notifications/
+│   │       ├── models.py
+│   │       ├── serializers.py
+│   │       ├── views.py
+│   │       ├── urls.py
+│   │       ├── services.py
+│   │       ├── templates/
+│   │       │   └── emails/
+│   │       │       ├── base_email.html
+│   │       │       ├── confirmation.html
+│   │       │       ├── booking_request.html
+│   │       │       ├── contract_pending.html
+│   │       │       └── payment_received.html
+│   │       └── migrations/
+│   ├── utils/
+│   │   ├── validators.py
+│   │   ├── storages.py
+│   │   └── helpers.py
+│   └── tests/
+│       ├── __init__.py
+│       ├── conftest.py
+│       ├── factories.py
+│       ├── test_accounts.py
+│       ├── test_portfolio.py
+│       ├── test_feed.py
+│       ├── test_chat.py
+│       ├── test_scheduling.py
+│       ├── test_contracts.py
+│       ├── test_payments.py
+│       └── test_notifications.py
+│
+├── frontend/
+│   ├── public/
+│   │   └── favicon.svg
+│   ├── src/
+│   │   ├── main.tsx
+│   │   ├── App.tsx
+│   │   ├── api/
+│   │   │   ├── client.ts
+│   │   │   ├── auth.ts
+│   │   │   ├── portfolio.ts
+│   │   │   ├── feed.ts
+│   │   │   ├── chat.ts
+│   │   │   ├── scheduling.ts
+│   │   │   ├── contracts.ts
+│   │   │   ├── payments.ts
+│   │   │   └── notifications.ts
+│   │   ├── types/
+│   │   │   ├── user.ts
+│   │   │   ├── portfolio.ts
+│   │   │   ├── feed.ts
+│   │   │   ├── chat.ts
+│   │   │   ├── scheduling.ts
+│   │   │   ├── contract.ts
+│   │   │   ├── payment.ts
+│   │   │   ├── notification.ts
+│   │   │   └── api.ts
+│   │   ├── store/
+│   │   │   ├── useAuthStore.ts
+│   │   │   ├── useChatStore.ts
+│   │   │   └── useNotificationStore.ts
+│   │   ├── hooks/
+│   │   │   ├── useAuth.ts
+│   │   │   ├── useWebSocket.ts
+│   │   │   ├── usePagination.ts
+│   │   │   └── useDebounce.ts
+│   │   ├── components/
+│   │   │   ├── common/
+│   │   │   │   ├── Button.tsx
+│   │   │   │   ├── Input.tsx
+│   │   │   │   ├── Select.tsx
+│   │   │   │   ├── Modal.tsx
+│   │   │   │   ├── Card.tsx
+│   │   │   │   ├── Badge.tsx
+│   │   │   │   ├── Avatar.tsx
+│   │   │   │   ├── Skeleton.tsx
+│   │   │   │   ├── Spinner.tsx
+│   │   │   │   ├── EmptyState.tsx
+│   │   │   │   └── Toast.tsx
+│   │   │   ├── layout/
+│   │   │   │   ├── Navbar.tsx
+│   │   │   │   ├── Sidebar.tsx
+│   │   │   │   ├── Footer.tsx
+│   │   │   │   ├── PageContainer.tsx
+│   │   │   │   └── AuthLayout.tsx
+│   │   │   ├── auth/
+│   │   │   │   ├── RegisterWizard.tsx
+│   │   │   │   ├── StepPersonalData.tsx
+│   │   │   │   ├── StepDocument.tsx
+│   │   │   │   ├── StepPassword.tsx
+│   │   │   │   ├── ConfirmEmail.tsx
+│   │   │   │   ├── LoginForm.tsx
+│   │   │   │   └── CompleteProfile.tsx
+│   │   │   ├── portfolio/
+│   │   │   │   ├── PortfolioGrid.tsx
+│   │   │   │   ├── PortfolioCard.tsx
+│   │   │   │   ├── VideoEmbed.tsx
+│   │   │   │   ├── PortfolioForm.tsx
+│   │   │   │   └── CategoryFilter.tsx
+│   │   │   ├── feed/
+│   │   │   │   ├── PostCard.tsx
+│   │   │   │   ├── PostForm.tsx
+│   │   │   │   ├── PostComments.tsx
+│   │   │   │   └── LikeButton.tsx
+│   │   │   ├── chat/
+│   │   │   │   ├── ConversationList.tsx
+│   │   │   │   ├── ConversationItem.tsx
+│   │   │   │   ├── ChatWindow.tsx
+│   │   │   │   ├── MessageBubble.tsx
+│   │   │   │   ├── MessageInput.tsx
+│   │   │   │   ├── TypingIndicator.tsx
+│   │   │   │   └── CreateGroupModal.tsx
+│   │   │   ├── scheduling/
+│   │   │   │   ├── CalendarView.tsx
+│   │   │   │   ├── DaySlots.tsx
+│   │   │   │   ├── BookingForm.tsx
+│   │   │   │   ├── BookingCard.tsx
+│   │   │   │   └── AvailabilityManager.tsx
+│   │   │   ├── contracts/
+│   │   │   │   ├── ContractCard.tsx
+│   │   │   │   ├── ContractDetail.tsx
+│   │   │   │   ├── ContractForm.tsx
+│   │   │   │   ├── AcceptanceButton.tsx
+│   │   │   │   └── PdfPreview.tsx
+│   │   │   ├── payments/
+│   │   │   │   ├── PaymentCheckout.tsx
+│   │   │   │   ├── PaymentHistory.tsx
+│   │   │   │   ├── PaymentCard.tsx
+│   │   │   │   └── LinkMercadoPago.tsx
+│   │   │   └── notifications/
+│   │   │       ├── NotificationBell.tsx
+│   │   │       ├── NotificationList.tsx
+│   │   │       └── NotificationItem.tsx
+│   │   ├── pages/
+│   │   │   ├── LandingPage.tsx
+│   │   │   ├── LoginPage.tsx
+│   │   │   ├── RegisterPage.tsx
+│   │   │   ├── ConfirmEmailPage.tsx
+│   │   │   ├── CompleteProfilePage.tsx
+│   │   │   ├── FeedPage.tsx
+│   │   │   ├── ProfilePage.tsx
+│   │   │   ├── ProfileEditPage.tsx
+│   │   │   ├── PortfolioPage.tsx
+│   │   │   ├── PortfolioPublicPage.tsx
+│   │   │   ├── ChatPage.tsx
+│   │   │   ├── SchedulePage.tsx
+│   │   │   ├── SchedulePublicPage.tsx
+│   │   │   ├── ContractsPage.tsx
+│   │   │   ├── ContractDetailPage.tsx
+│   │   │   ├── PaymentCheckoutPage.tsx
+│   │   │   ├── PaymentHistoryPage.tsx
+│   │   │   ├── NotificationsPage.tsx
+│   │   │   ├── LinkMercadoPagoPage.tsx
+│   │   │   └── ExploreVideomakersPage.tsx
+│   │   └── utils/
+│   │       ├── constants.ts
+│   │       ├── formatters.ts
+│   │       ├── validators.ts
+│   │       └── embed.ts
+│   ├── tests/
+│   │   └── (testes de componentes)
+│   ├── index.html
+│   ├── tailwind.config.ts
+│   ├── postcss.config.js
+│   ├── tsconfig.json
+│   ├── vite.config.ts
+│   └── package.json
+│
+├── docker/
+│   ├── Dockerfile.backend
+│   ├── Dockerfile.frontend
+│   └── nginx.conf
+│
+├── .github/
+│   └── workflows/
+│       └── test.yml
+│
+├── docker-compose.yml
+├── docker-compose.dev.yml
+├── .env.example
+├── .gitignore
+├── README.md
+└── REQUISITOS.txt
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+17. README DO PROJETO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+O README.md deve conter as seguintes seções para um portfólio profissional:
+
+  1. Banner/Título
+     - Logo do FilmersHub
+     - Tagline: "Rede social profissional para videomakers"
+     - Badges: build status, coverage, license
+
+  2. Descrição
+     - O que é o FilmersHub
+     - Problema que resolve
+     - Público-alvo
+
+  3. Demo
+     - Link para versão online (Vercel)
+     - Screenshots ou GIFs das telas principais
+     - Vídeo demo (opcional, mas valoriza muito)
+
+  4. Funcionalidades
+     - Lista com ícones de cada módulo
+     - Status: Concluído / Em desenvolvimento / Planejado
+
+  5. Stack Técnica
+     - Ícones das tecnologias (React, Django, PostgreSQL, etc.)
+
+  6. Como Rodar
+     - Pré-requisitos (Docker, Node, Python)
+     - Clone do repositório
+     - docker-compose up
+     - Acessar localhost:5173
+
+  7. Estrutura do Projeto
+     - Árvore de pastas simplificada
+     - Breve explicação de cada módulo
+
+  8. API
+     - Link para Swagger (se disponível)
+     - Exemplo de endpoints principais
+
+  9. Autor
+     - Seu nome
+     - Links: LinkedIn, GitHub, Instagram (@films.byemi)
+     - Email de contato
+
+  10. Licença
+      - MIT (ou outra escolhida)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                          FIM DO DOCUMENTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

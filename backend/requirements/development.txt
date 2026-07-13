@@ -1,0 +1,23 @@
+# ===========================================
+# FILMERSHUB - DEPENDÊNCIAS DE DESENVOLVIMENTO
+# ===========================================
+# Só instaladas em ambiente de desenvolvimento
+
+# Herda todas as dependências base
+-r base.txt
+
+# Testes automatizados
+pytest-django>=4.8
+pytest-cov>=5.0
+
+# Fábricas de dados fake (para testes)
+factory-boy>=3.3
+
+# Debug toolbar (mostra queries SQL, tempo de resposta)
+django-debug-toolbar>=4.3
+
+# Geração de dados fake (nomes, emails, CPFs)
+faker>=24.0
+
+# Extensões do Django (shell plus, etc.)
+django-extensions>=3.2

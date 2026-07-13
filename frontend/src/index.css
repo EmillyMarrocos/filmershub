@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===========================================
+   FILMERSHUB - ESTILOS GLOBAIS
+   =========================================== */
+
+:root {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  @apply bg-void text-snow;
+  min-height: 100vh;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-obsidian;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted;
+}
+
+/* Seleção de texto */
+::selection {
+  @apply bg-iris/30 text-white;
+}
+
+/* Links */
+a {
+  @apply text-iris hover:text-iris/80 transition-colors;
+}
+
+/* Botões */
+.btn-primary {
+  @apply bg-iris hover:bg-iris/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200;
+}
+
+.btn-secondary {
+  @apply bg-slate hover:bg-slate/80 text-snow font-medium py-2 px-4 rounded-lg transition-all duration-200;
+}
+
+.btn-ghost {
+  @apply bg-transparent hover:bg-slate/50 text-snow font-medium py-2 px-4 rounded-lg transition-all duration-200;
+}
+
+.btn-danger {
+  @apply bg-crimson hover:bg-crimson/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200;
+}
+
+/* Cards */
+.card {
+  @apply bg-obsidian border border-slate/50 rounded-xl p-6;
+}
+
+/* Inputs */
+.input {
+  @apply w-full bg-graphite border border-slate/50 rounded-lg px-4 py-3 text-snow placeholder-muted focus:outline-none focus:border-iris focus:ring-1 focus:ring-iris/50 transition-all;
+}
+
+/* Badges */
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-iris {
+  @apply bg-iris/20 text-iris;
+}
+
+.badge-ember {
+  @apply bg-ember/20 text-ember;
+}
+
+.badge-jade {
+  @apply bg-jade/20 text-jade;
+}
+
+.badge-crimson {
+  @apply bg-crimson/20 text-crimson;
+}
+
+.badge-amber {
+  @apply bg-amber/20 text-amber;
+}

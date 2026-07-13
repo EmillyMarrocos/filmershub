@@ -1,0 +1,13 @@
+# ===========================================
+# FILMERSHUB - DEPENDÊNCIAS DE PRODUÇÃO
+# ===========================================
+# Só instaladas em produção
+
+# Herda todas as dependências base
+-r base.txt
+
+# Servidor WSGI (roda o Django em produção)
+gunicorn>=22.0
+
+# Monitoramento de erros (Sentry)
+sentry-sdk>=2.0

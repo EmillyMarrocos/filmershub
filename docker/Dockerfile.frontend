@@ -1,0 +1,37 @@
+# ===========================================
+# FILMERSHUB - FRONTEND (React + Vite + TypeScript)
+# ===========================================
+# Este arquivo define como construir a imagem Docker do frontend
+# Comando para buildar: docker-compose build frontend
+
+# ---- ETAPA 1: Imagem base ----
+# Usar imagem oficial do Node.js 20 (versão Alpine = mais leve)
+FROM node:20-alpine
+
+# ---- ETAPA 2: Variáveis de ambiente ----
+# Evita que o npm fique lento em containers
+ENV CI=true
+
+# ---- ETAPA 3: Diretório de trabalho ----
+WORKDIR /app
+
+# ---- ETAPA 4: Dependências ----
+# Copiar apenas package.json primeiro (cachamento de camadas)
+COPY frontend/package*.json ./
+
+# Instalar dependências npm
+# npm install = instala tudo que está em package.json
+RUN npm install
+
+# ---- ETAPA 5: Código do frontend ----
+# Copiar todo o código do frontend
+COPY frontend/ .
+
+# ---- ETAPA 6: Porta ----
+# Documenta que a aplicação usa a porta 5173 (Vite default)
+EXPOSE 5173
+
+# ---- ETAPA 7: Comando padrão ----
+# Roda o Vite em modo desenvolvimento
+# --host = aceita conexões externas (necessário para Docker)
+CMD ["npm", "run", "dev", "--", "--host"]
