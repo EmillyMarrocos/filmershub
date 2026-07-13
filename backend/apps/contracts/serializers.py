@@ -55,11 +55,6 @@ class ContractCreateSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class ContractSignSerializer(serializers.Serializer):
-    """Serializer para assinatura do contrato."""
-    pass
-
-
 class ContractClauseCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContractClause

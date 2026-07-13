@@ -54,7 +54,7 @@ class PostDetailSerializer(PostListSerializer):
     comments = serializers.SerializerMethodField()
 
     class Meta(PostListSerializer.Meta):
-        fields = PostListSerializer.Meta.fields + ['description', 'updated_at', 'comments']
+        fields = PostListSerializer.Meta.fields + ['updated_at', 'comments']
 
     def get_comments(self, obj):
         comments = obj.comments.filter(parent=None)

@@ -26,9 +26,19 @@ export default function Schedule() {
     notes: '',
   });
 
+  const [calendarDate, setCalendarDate] = useState(new Date());
+
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowModal(false);
+    };
+    if (showModal) window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [showModal]);
 
   const fetchEvents = async () => {
     try {
@@ -179,10 +189,79 @@ export default function Schedule() {
         </div>
       )}
 
-      {/* Calendar view placeholder */}
+      {/* Calendar view */}
       {view === 'calendar' && (
-        <div className="card text-center py-12">
-          <p className="text-muted">Visualização em calendário em breve.</p>
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <button
+              onClick={() => setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1))}
+              className="p-2 text-muted hover:text-snow transition-colors"
+            >
+              ←
+            </button>
+            <h3 className="text-lg font-bold text-snow">
+              {calendarDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+            </h3>
+            <button
+              onClick={() => setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1))}
+              className="p-2 text-muted hover:text-snow transition-colors"
+            >
+              →
+            </button>
+          </div>
+
+          <div className="grid grid-cols-7 gap-px bg-slate/30 rounded-lg overflow-hidden">
+            {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day) => (
+              <div key={day} className="bg-obsidian p-2 text-center text-xs font-medium text-muted">
+                {day}
+              </div>
+            ))}
+
+            {(() => {
+              const year = calendarDate.getFullYear();
+              const month = calendarDate.getMonth();
+              const firstDay = new Date(year, month, 1).getDay();
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+              const today = new Date();
+
+              const cells = [];
+              for (let i = 0; i < firstDay; i++) {
+                cells.push(<div key={`empty-${i}`} className="bg-obsidian min-h-[80px] p-1" />);
+              }
+
+              for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayEvents = events.filter((e) => {
+                  const eventDate = new Date(e.start_datetime).toISOString().split('T')[0];
+                  return eventDate === dateStr;
+                });
+                const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
+
+                cells.push(
+                  <div key={day} className="bg-obsidian min-h-[80px] p-1">
+                    <div className={`text-xs font-medium mb-1 ${isToday ? 'text-iris font-bold' : 'text-muted'}`}>
+                      {day}
+                    </div>
+                    {dayEvents.map((event) => (
+                      <div
+                        key={event.id}
+                        className={`text-[10px] leading-tight px-1 py-0.5 rounded mb-0.5 truncate ${
+                          event.status === 'confirmed' ? 'bg-jade/20 text-jade' :
+                          event.status === 'cancelled' ? 'bg-crimson/20 text-crimson' :
+                          'bg-iris/20 text-iris'
+                        }`}
+                        title={event.title}
+                      >
+                        {event.title}
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+
+              return cells;
+            })()}
+          </div>
         </div>
       )}
 

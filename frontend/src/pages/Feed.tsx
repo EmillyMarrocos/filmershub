@@ -221,6 +221,10 @@ export default function Feed() {
     const url = `${window.location.origin}/feed#${postId}`;
     try {
       await navigator.clipboard.writeText(url);
+      await api.post(`/feed/${postId}/share/`);
+      setPosts(prev => prev.map(p =>
+        p.id === postId ? { ...p, shares_count: p.shares_count + 1 } : p
+      ));
       toast.success('Link copiado!');
     } catch {
       toast.error('Erro ao copiar link');

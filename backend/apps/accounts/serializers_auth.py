@@ -151,9 +151,9 @@ class ForgotPasswordSerializer(serializers.Serializer):
             user = User.objects.get(email=email)
             token = secrets.token_urlsafe(32)
             expires = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=1)
-            user._reset_token = token
-            user._reset_expires = expires
-            user.save(update_fields=[])
+            user.reset_token = token
+            user.reset_token_expires = expires
+            user.save(update_fields=['reset_token', 'reset_token_expires'])
             return {'token': token, 'email': email}
         except User.DoesNotExist:
             return {'token': None, 'email': email}
@@ -178,15 +178,27 @@ class ResetPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({
                 'new_password_confirm': 'As senhas não conferem.'
             })
+
+        email = attrs.get('email')
+        token = attrs.get('token')
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('Usuário não encontrado.')
+
+        if not user.reset_token or user.reset_token != token:
+            raise serializers.ValidationError('Token inválido.')
+
+        if user.reset_token_expires and user.reset_token_expires < datetime.datetime.now(datetime.timezone.utc):
+            raise serializers.ValidationError('Token expirado. Solicite um novo.')
+
+        attrs['user'] = user
         return attrs
 
     def save(self):
-        email = self.validated_data['email']
-        new_password = self.validated_data['new_password']
-        try:
-            user = User.objects.get(email=email)
-            user.set_password(new_password)
-            user.save()
-            return user
-        except User.DoesNotExist:
-            raise serializers.ValidationError('Usuário não encontrado.')
+        user = self.validated_data['user']
+        user.set_password(self.validated_data['new_password'])
+        user.reset_token = None
+        user.reset_token_expires = None
+        user.save(update_fields=['password', 'reset_token', 'reset_token_expires'])
+        return user

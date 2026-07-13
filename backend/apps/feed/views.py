@@ -12,7 +12,6 @@ from .serializers import (
     PostDetailSerializer,
     PostCreateSerializer,
     PostUpdateSerializer,
-    LikeSerializer,
     CommentSerializer,
     CommentCreateSerializer,
 )
@@ -71,23 +70,6 @@ class PostCreateView(generics.CreateAPIView):
         serializer.save(author=self.request.user)
 
 
-class PostDeleteView(generics.DestroyAPIView):
-    """DELETE /api/v1/feed/<uuid:pk>/"""
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        return Post.objects.filter(author=self.request.user)
-
-
-class PostUpdateView(generics.UpdateAPIView):
-    """PUT /api/v1/feed/<uuid:pk>/"""
-    serializer_class = PostCreateSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        return Post.objects.filter(author=self.request.user)
-
-
 class LikeToggleView(APIView):
     """POST /api/v1/feed/<uuid:post_id>/like/"""
     permission_classes = [permissions.IsAuthenticated]
@@ -128,4 +110,18 @@ class CommentListView(generics.ListAPIView):
         return Comment.objects.filter(
             post_id=self.kwargs['post_id'],
             parent=None
+        )
+
+
+class SharePostView(APIView):
+    """POST /api/v1/feed/<uuid:post_id>/share/"""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        post.shares_count += 1
+        post.save(update_fields=['shares_count'])
+        return Response(
+            {'shares_count': post.shares_count},
+            status=status.HTTP_200_OK
         )

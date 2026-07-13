@@ -7,14 +7,15 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.http import HttpResponse
 from .models import Contract, ContractClause
 from .serializers import (
     ContractListSerializer,
     ContractDetailSerializer,
     ContractCreateSerializer,
-    ContractSignSerializer,
     ContractClauseCreateSerializer,
 )
+from .utils import generate_contract_pdf, generate_contract_html
 
 
 class ContractListView(generics.ListAPIView):
@@ -43,7 +44,13 @@ class ContractCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(videomaker=self.request.user)
+        contract = serializer.save(videomaker=self.request.user)
+        try:
+            pdf_content = generate_contract_pdf(contract)
+            contract.pdf_file = pdf_content
+            contract.save(update_fields=['pdf_file'])
+        except Exception:
+            pass
 
 
 class ContractSignView(APIView):
@@ -53,14 +60,12 @@ class ContractSignView(APIView):
     def post(self, request, pk):
         contract = get_object_or_404(Contract, id=pk)
 
-        # Verifica se o usuário é parte do contrato
         if request.user not in [contract.client, contract.videomaker]:
             return Response(
                 {'detail': 'Você não é parte deste contrato.'},
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Verifica se já assinou
         if request.user == contract.client and contract.client_signed:
             return Response(
                 {'detail': 'Você já assinou este contrato.'},
@@ -73,7 +78,6 @@ class ContractSignView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Assina
         if request.user == contract.client:
             contract.client_signed = True
             contract.client_signed_at = timezone.now()
@@ -81,16 +85,54 @@ class ContractSignView(APIView):
             contract.videomaker_signed = True
             contract.videomaker_signed_at = timezone.now()
 
-        # Atualiza status se ambos assinaram
         if contract.client_signed and contract.videomaker_signed:
             contract.status = 'signed'
 
         contract.save()
 
+        try:
+            pdf_content = generate_contract_pdf(contract)
+            contract.pdf_file = pdf_content
+            contract.save(update_fields=['pdf_file'])
+        except Exception:
+            pass
+
         return Response(
             {'detail': 'Contrato assinado com sucesso!'},
             status=status.HTTP_200_OK
         )
+
+
+class ContractPDFView(APIView):
+    """GET /api/v1/contracts/<uuid:pk>/pdf/"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        contract = get_object_or_404(Contract, id=pk)
+
+        if request.user not in [contract.client, contract.videomaker]:
+            return Response(
+                {'detail': 'Você não é parte deste contrato.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        if contract.pdf_file:
+            response = HttpResponse(contract.pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'inline; filename="{contract.contract_number}.pdf"'
+            return response
+
+        html_content = generate_contract_html(contract)
+        try:
+            from weasyprint import HTML
+            pdf_bytes = HTML(string=html_content).write_pdf()
+            response = HttpResponse(pdf_bytes, content_type='application/pdf')
+            response['Content-Disposition'] = f'inline; filename="{contract.contract_number}.pdf"'
+            return response
+        except Exception:
+            return Response(
+                {'detail': 'Erro ao gerar PDF.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class ContractClauseCreateView(generics.CreateAPIView):

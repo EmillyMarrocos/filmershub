@@ -128,7 +128,3 @@ class BookingRequestResponseView(APIView):
             {'detail': f'Solicitação {booking.get_status_display()}.'},
             status=status.HTTP_200_OK
         )
-
-
-# Import needed for EventListView
-from django.db import models  # noqa: E402

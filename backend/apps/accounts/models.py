@@ -111,6 +111,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField('Ativo', default=True)
     is_staff = models.BooleanField('Staff', default=False)
 
+    # Reset de senha
+    reset_token = models.CharField('Token de Reset', max_length=64, blank=True, null=True, unique=True)
+    reset_token_expires = models.DateTimeField('Expiração do Token', null=True, blank=True)
+
     # Timestamps
     date_joined = models.DateTimeField('Data de Cadastro', default=timezone.now)
     updated_at = models.DateTimeField('Atualizado em', auto_now=True)
