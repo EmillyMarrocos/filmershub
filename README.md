@@ -1,77 +1,228 @@
-🎬 FilmersHub
-Uma plataforma social e hub de negócios para a comunidade de videomakers.
+<div align="center">
 
-O FilmersHub é uma plataforma full-stack desenvolvida para conectar, apoiar e profissionalizar videomakers. Mais do que um agregador de portfólios, o sistema funciona como uma ferramenta de gestão e uma comunidade ativa. Ele permite que criadores exponham seus trabalhos, troquem conhecimentos em tempo real, organizem suas agendas e gerem contratos profissionais de forma automatizada.
+# 🎬 FilmersHub
 
-🎯 O Problema que Resolvemos
+### A plataforma social e de negócios para a comunidade de videomakers
+
+[![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)](https://python.org)
+[![Django](https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white)](https://djangoproject.com)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://postgresql.org)
+[![Docker](https://img.shields.io/badge/Docker-29-2496ED?logo=docker&logoColor=white)](https://docker.com)
+
+[LinkedIn](https://www.linkedin.com/in/emilly-marrocos-mendon%C3%A7a-ciriaco-5751b1385/) · [Instagram](https://www.instagram.com/films.byemi/) · [Instagram Dev](https://www.instagram.com/emilly.codes/)
+
+</div>
+
+---
+
+## 📖 Sobre o Projeto
+
+O **FilmersHub** é uma plataforma full-stack desenvolvida como projeto de portfólio para conectar, apoiar e profissionalizar videomakers. Mais do que um agregador de portfólios, o sistema funciona como uma ferramenta de gestão e uma comunidade ativa.
+
 Videomakers independentes frequentemente enfrentam dificuldades em três frentes:
 
-Atração de Clientes: Dependência exclusiva do Instagram, sem um portfólio web estruturado e focado em conversão.
-Gestão do Negócio: Dificuldade em precificar serviços, montar orçamentos e redigir contratos profissionais.
-Comunidade: Falta de um espaço focado para trocar experiências técnicas (equipamentos, edição) e de mercado com outros profissionais.
-O FilmersHub centraliza a solução para essas dores, unindo uma vitrine para clientes a um painel de ferramentas e networking para o criador.
+- **Atração de Clientes** — Dependência exclusiva do Instagram, sem um portfólio web estruturado
+- **Gestão do Negócio** — Dificuldade em precificar, montar orçamentos e redigir contratos
+- **Comunidade** — Falta de um espaço focado para trocar experiências técnicas e de mercado
 
-✨ Principais Funcionalidades
-Portfólios Dinâmicos: Perfis customizáveis por videomaker com bio, localização, nichos de atuação e galeria de vídeos.
-Comunidade & Feed de Dicas: Timeline para membros compartilharem insights diários, com sistema de comentários.
-Chat em Tempo Real: Canais de discussão temáticos (#precificação, #equipamentos, #edição) via WebSockets.
-Geração de Contratos Automática: Criação de contratos em PDF baseada nos dados do cliente e escopo do projeto, prontos para envio.
-Gestão de Agenda e Preços: Tabela de referência de preços e calendário de disponibilidade integrado ao perfil.
-Moderação Inteligente: Sistema de permissões dividido entre Videomakers (membros), Clientes (visitantes) e Administradores (moderação).
-🚀 Stack Tecnológica
-O projeto foi construído focando em escalabilidade, performance e dados em tempo real:
+O FilmersHub centraliza a solução para essas dores.
 
-Backend & Infraestrutura
+---
 
-Python / Django: Lógica de negócios e ORM.
-Django REST Framework (DRF): Construção da API RESTful.
-Django Channels + Redis: Gerenciamento de conexões WebSocket para o chat em tempo real.
-PostgreSQL: Banco de dados relacional para estruturação robusta de usuários e conteúdos.
-Docker & Docker Compose: Containerização do ambiente de desenvolvimento.
+## ✨ Funcionalidades
 
-Frontend & Mídia
+### 🔐 Autenticação
+- Login e registro em 2 etapas (videomaker, cliente ou ambos)
+- Senha visível/invisível, recuperação e redefinição via email
+- JWT com refresh token automático
 
-React / Next.js: Interface de usuário reativa, dinâmica e amigável a SEO.
+### 📰 Feed Social
+- Criar, editar e excluir posts (optimistic updates)
+- Reações com emoji picker
+- Comentários em modal com tempo real
+- Compartilhar (copiar link)
+- Paginação com "Carregar mais"
 
-Cloudinary API: Gerenciamento e otimização de upload de mídias (vídeos e imagens).
+### 🎬 Portfólio
+- Upload de arquivos (vídeo/foto) e thumbnail
+- Categorias filtráveis
+- Menu 3-pontos: editar, publicar/rascunho, copiar link, excluir
+- Modal de confirmação customizada
 
-⚙️ Como Executar Localmente
+### 💬 Chat
+- Salas de conversa 1-a-1
+- Indicador de mensagens não lidas
+- Marcar mensagens como lidas
 
-Pré-requisitos
+### 📅 Agenda
+- Criar e gerenciar eventos
+- Visualização em lista
 
-Docker e Docker Compose instalados na sua máquina.
+### 📄 Contratos
+- Criação com resolução de cliente por email
+- Assinatura digital com hash SHA-256
+- Geração de PDF profissional (WeasyPrint)
 
+### 🔔 Notificações
+- Notificações in-app com ícones por tipo
+- Contador de não lidas no header
+- Marcar individual ou todas como lidas
 
-Passos
+### 👤 Perfil
+- Editar dados, avatar e redes sociais
+- Botão "Seguir" / "Mensagem" em perfis de outros
+- Tabs: Trabalhos, Avaliações, Sobre
+- Excluir conta com confirmação
 
-Clone o repositório
-bash
+### 🏠 Landing Page (Home)
+- Hero com gradientes animados
+- Contadores animados (IntersectionObserver)
+- "Como funciona" (3 passos)
+- Videomakers e trabalhos em destaque da API
+- CTA, footer com 4 colunas
 
-git clone https://github.com/seu-usuario/filmershub.git
+### 🔍 Explorar
+- Busca por nome e cidade
+- Grid de videomakers com paginação
 
+---
+
+## 🏗️ Arquitetura
+
+```
+filmershub/
+├── backend/                    # Django 5 + DRF
+│   ├── apps/
+│   │   ├── accounts/           # Auth, perfis, follow
+│   │   ├── feed/               # Posts, likes, comentários
+│   │   ├── portfolio/          # Trabalhos, categorias, reviews
+│   │   ├── chat/               # Salas e mensagens
+│   │   ├── scheduling/         # Eventos e agenda
+│   │   ├── contracts/          # Contratos e assinaturas
+│   │   ├── payments/           # Mercado Pago (PIX/cartão)
+│   │   ├── notifications/      # Notificações in-app + email
+│   │   └── landing/            # Stats e dados da home
+│   ├── config/                 # Settings (dev/test/prod)
+│   ├── tests/                  # 103 testes (pytest-django)
+│   └── requirements/           # Dependências por ambiente
+├── frontend/                   # React 18 + TypeScript + Vite
+│   └── src/
+│       ├── pages/              # 15 páginas
+│       ├── components/layout/  # Header, Sidebar, Layout
+│       ├── api/                # Axios client + interceptors
+│       ├── store/              # Zustand (authStore)
+│       └── types/              # TypeScript interfaces
+├── docker/                     # Dockerfiles
+├── docker-compose.yml          # PostgreSQL, Redis, Backend, Frontend
+└── .env.example                # Variáveis de ambiente
+```
+
+---
+
+## 🚀 Stack Tecnológica
+
+| Camada | Tecnologias |
+|--------|------------|
+| **Backend** | Python 3.13, Django 5.2, DRF, SimpleJWT, DRF Spectacular |
+| **Frontend** | React 18, TypeScript 5, Vite 5, Tailwind CSS 3, Zustand, React Hook Form |
+| **Banco de Dados** | PostgreSQL 16, Redis 7 |
+| **Tempo Real** | Django Channels, Daphne, Channels-Redis |
+| **Infraestrutura** | Docker, Docker Compose |
+| **Pagamentos** | Mercado Pago (PIX + Cartão de crédito, split 85/15) |
+| **Email** | SendGrid |
+| **PDF** | WeasyPrint (contratos com 12 cláusulas) |
+| **Testes** | pytest-django, factory-boy, SQLite in-memory |
+
+---
+
+## ⚙️ Como Executar
+
+### Com Docker (Recomendado)
+
+```bash
+# 1. Clone o repositório
+git clone https://github.com/EmillyMarrocos/filmershub.git
 cd filmershub
 
-Crie um arquivo .env na raiz do projeto baseado no .env.example e adicione suas credenciais do Cloudinary.
+# 2. Configure as variáveis de ambiente
+cp .env.example .env
+# Edite o .env com suas credenciais
 
-Suba os containers do banco de dados e do Redis:
-
-bash
-
+# 3. Suba os containers
 docker-compose up -d
-Execute as migrações do banco de dados:
 
-bash
+# 4. Acesse
+# Frontend: http://localhost:5173
+# Backend:  http://localhost:8000
+# API Docs: http://localhost:8000/api/docs/
+```
 
+### Desenvolvimento Local (Sem Docker)
+
+**Pré-requisitos:** Python 3.13+, Node.js 24+
+
+```bash
+# Backend
+cd backend
+python -m venv venv
+venv\Scripts\activate          # Windows
+# source venv/bin/activate    # Linux/Mac
+
+pip install -r requirements/development.txt
+
+# Crie o .env (opcional para dev - usa SQLite por padrão)
 python manage.py migrate
-Inicie o servidor de desenvolvimento:
-bash
-
 python manage.py runserver
-👨‍💻 Desenvolvido por
-[Emilly Marrocos]
 
-LinkedIN: (https://www.linkedin.com/in/emilly-marrocos-mendon%C3%A7a-ciriaco-5751b1385/)
+# Frontend (em outro terminal)
+cd frontend
+npm install
+npm run dev
+```
 
-Instagram: (https://www.instagram.com/emilly.codes/)
+---
 
-Este projeto foi desenvolvido como uma solução real para a comunidade de videomakers, unindo habilidades de desenvolvimento Full-Stack e o entendimento das dores do mercado audiovisual.
+## 📋 Variáveis de Ambiente
+
+| Variável | Descrição | Padrão (dev) |
+|----------|-----------|-------------|
+| `DJANGO_SECRET_KEY` | Chave secreta do Django | `django-insecure-...` |
+| `DJANGO_DEBUG` | Modo debug | `True` |
+| `DATABASE_URL` | URL do PostgreSQL | `postgres://...localhost:5432/filmershub` |
+| `REDIS_URL` | URL do Redis | `redis://localhost:6379/0` |
+| `CORS_ALLOWED_ORIGINS` | Origens permitidas | `http://localhost:5173` |
+| `MERCADOPAGO_ACCESS_TOKEN` | Token Mercado Pago | _(configurar depois)_ |
+| `SENDGRID_API_KEY` | Chave SendGrid | _(configurar depois)_ |
+| `EMAIL_BACKEND` | Backend de email | `console.EmailBackend` |
+
+> **Nota:** Em desenvolvimento local sem PostgreSQL/Redis, o projeto usa SQLite + cache InMemory automaticamente.
+
+---
+
+## 🧪 Testes
+
+```bash
+cd backend
+python -m pytest --tb=short -q
+# 103 passed — accounts, chat, contracts, feed, notifications, payments, portfolio, scheduling
+```
+
+---
+
+## 👨‍💻 Desenvolvido por
+
+**Emilly Marrocos** — Estudante de Ciência da Computação (4º semestre) & Videomakers profissional
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Emilly%20Marrocos-0A66C2?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/emilly-marrocos-mendon%C3%A7a-ciriaco-5751b1385/)
+[![Instagram](https://img.shields.io/badge/Instagram-%40films.byemi-E4405F?logo=instagram&logoColor=white)](https://www.instagram.com/films.byemi/)
+[![Instagram Dev](https://img.shields.io/badge/Instagram-%40emilly.codes-E4405F?logo=instagram&logoColor=white)](https://www.instagram.com/emilly.codes/)
+
+---
+
+<div align="center">
+
+Feito com 💜 para a comunidade de videomakers
+
+</div>
